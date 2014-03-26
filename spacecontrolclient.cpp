@@ -235,8 +235,8 @@ void Sink::sendSpaceCommand(SpaceCommand* sc) {
 }
 
 
-SpaceControlClient::SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd)
-    : m_client(_client), m_hnd(_hnd) {
+SpaceControlClient::SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser)
+    : m_client(_client), m_hnd(_hnd), m_ser(_ser) {
     if (_client)
         _client->registerMessageSessionHandler(this);
 }
@@ -284,6 +284,11 @@ gloox::Client* SpaceControlClient::client() {
 SpaceControlHandler* SpaceControlClient::handler() {
     return this->m_hnd;
 }
+
+SpaceCommandSerializer* SpaceControlClient::serializer() {
+  return this->m_ser;
+}
+
 
 SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
     gloox::MessageSession* session = new gloox::MessageSession(this->m_client, peer);

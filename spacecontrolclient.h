@@ -207,8 +207,9 @@ public:
     /*!
      * \param _client An already configured XMPP client.
      * \param _hnd the space control handler to process the received Space Commands
+     * \param _ser the space command serializer
      */
-    SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd);
+    SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser);
 
     //! message session handler
     /*!
@@ -235,6 +236,12 @@ public:
      * \returns the space control handler used by this space control client.
      */
     SpaceControlHandler* handler();
+    
+    //! Get the space command serializer
+    /*!
+     * \returns the space command serializer
+     */
+    SpaceCommandSerializer* serializer();
 
     //! Create a space command sink with a new session.
     /*!
@@ -255,6 +262,7 @@ protected:
 private:
     gloox::Client* m_client;
     SpaceControlHandler* m_hnd;
+    SpaceCommandSerializer* m_ser;
 };
 
 }
