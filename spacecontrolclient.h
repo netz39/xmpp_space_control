@@ -78,7 +78,6 @@ private:
     int m_line_number;
 };
 
-
 //! Space Command representation.
 /*!
  * This class represents a Space Command, consisting of the issuing/receiving
@@ -111,6 +110,8 @@ public:
      */
     std::string param(const std::string key) throw(std::out_of_range);
 
+    space_command_params params();
+
     //! Create a message body representation of this Space Command.
     /*!
      * Converts the Space Command instance into an equivalent message body
@@ -119,11 +120,46 @@ public:
      * \sa SpaceControlClient::parseMessage
      */
     std::string as_body();
+
 private:
     std::string m_cmd;
     space_command_params m_params;
 };
 
+//! Interface to a Space Command serializer
+class SpaceCommandSerializer {
+public:
+    virtual ~SpaceCommandSerializer() = 0;
+
+    //! Serialize a Space Command for sending
+    /*!
+     * \param cmd Pointer to the space command, must not be null
+     * \returns The serialized message as String
+     */
+    virtual std::string to_body(SpaceCommand* cmd) = 0;
+
+    //! De-Serialize a received Space Command
+    /*!
+     * \param body The message body containing the command.
+     * \returns pointer to the created command
+     * \throws SpaceCommandFormatException if the body cannot be de-serialized
+     */
+    virtual SpaceCommand to_command(const std::string body)
+    throw(SpaceCommandFormatException) = 0;
+};
+
+//! Serializer for text-based messages
+class TextSpaceCommandSerializer : public SpaceCommandSerializer {
+public:
+    TextSpaceCommandSerializer();
+    
+    virtual ~TextSpaceCommandSerializer();
+
+    virtual std::string to_body(SpaceCommand* cmd);
+    
+    virtual SpaceCommand to_command(const std::string body)
+    throw(SpaceCommandFormatException);
+};
 
 //! Interface to send out Space Commands
 /*!

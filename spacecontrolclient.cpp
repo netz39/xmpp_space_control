@@ -56,6 +56,11 @@ std::string SpaceCommand::param(const std::string key) throw(std::out_of_range) 
     return m_params.at(key);
 }
 
+SpaceCommand::space_command_params SpaceCommand::params() {
+    return m_params;
+}
+
+
 std::string SpaceCommand::as_body() {
     // build parameter list
     std::stringstream params("");
@@ -92,6 +97,117 @@ std::string SpaceCommand::as_body() {
 
     return body.str();
 }
+
+
+SpaceCommandSerializer::~SpaceCommandSerializer() {}
+
+
+TextSpaceCommandSerializer::TextSpaceCommandSerializer() {}
+
+TextSpaceCommandSerializer::~TextSpaceCommandSerializer() {}
+
+std::string TextSpaceCommandSerializer::to_body(SpaceCommand* cmd) {
+
+    // build parameter list
+    std::stringstream pars("");
+
+    SpaceCommand::space_command_params::iterator iter;
+
+    for (iter =  cmd->params().begin(); iter != cmd->params().end(); iter++) {
+        // count lines in parameter value
+        int paramlines = 0;
+
+        if (iter->second.empty())
+            paramlines = 0;
+        else {
+            paramlines = 1;
+            const char* val = iter->second.c_str();
+            int i;
+            for (i = iter->second.size(); i; i--)
+                if (val[i] == '\n')
+                    paramlines++;
+        }
+
+        if (!pars.str().empty())
+            pars << std::endl;
+        pars << paramlines << " " << iter->first << std::endl;
+        pars << iter->second;
+    }
+
+
+    // build message body
+    std::stringstream body;
+    body << cmd->cmd();
+    if (!pars.str().empty())
+        body << std::endl << pars.str();
+
+    return body.str();
+}
+
+SpaceCommand TextSpaceCommandSerializer::to_command(const std::string body)
+throw(SpaceCommandFormatException) {
+    // the command
+    std::string command;
+    // the parameter map
+    SpaceCommand::space_command_params params;
+
+    //parse command and params from msg body
+    int line_number = 0;
+    std::stringstream ss(body);
+    std::string line;
+    while (std::getline(ss, line, '\n')) {
+        line_number++;
+
+        // first line is command
+        if (command.empty())
+            command = line;
+        else {
+            /* Note: std::stoi is not available yet :(
+             *
+             *            // split the parameter line
+             *            const size_t idx = 0;
+             *            // first is the number of lines containing the value
+             *            const int parlines = std::stoi(line, &idx);
+             *            // after the space is the parameter name
+             *            const std::string key = line.substr(idx+1);
+             */
+
+            // find the space character
+            const size_t idx = line.find(' ');
+            if (idx == std::string::npos)
+                throw SpaceCommandFormatException("Missing space character in parameter key line.", body, line_number);
+
+            // get the number of parameter lines
+            const std::string s_parlines = line.substr(0, idx);
+            int parlines = strtol(s_parlines.c_str(), 0, 10);
+            if (parlines == 0)
+                throw SpaceCommandFormatException("Invalid integer for parameter line count.", body, line_number);
+
+            // get the parameter key
+            const std::string key = line.substr(idx+1);
+
+            // get the parameter lines
+            std::string value;
+            while (parlines--) {
+                std::string parline;
+                if (!std::getline(ss, parline, '\n'))
+                    throw SpaceCommandFormatException("There are less lines that stated in the parameter line count!", body, line_number);
+                line_number++;
+
+                if (!value.empty())
+                    value.append("\n");
+                value.append(parline);
+            }
+
+            // add to parameter map
+            params[key] = value;
+        }
+    }
+
+    // create the command
+    return SpaceCommand(command, params);
+}
+
 
 // local helper class
 class Sink : public SpaceCommandSink {
