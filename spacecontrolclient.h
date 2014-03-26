@@ -14,7 +14,6 @@
  */
 
 //TODO extrn?
-//TODO distinct class for message conversion
 
 #ifndef SPACECONTROLCLIENT_H__
 #define SPACECONTROLCLIENT_H__
@@ -111,15 +110,6 @@ public:
     std::string param(const std::string key) throw(std::out_of_range);
 
     space_command_params params();
-
-    //! Create a message body representation of this Space Command.
-    /*!
-     * Converts the Space Command instance into an equivalent message body
-     * that can be sent via XMPP to other peers.
-     * \returns Message body representation of this Space Command.
-     * \sa SpaceControlClient::parseMessage
-     */
-    std::string as_body();
 
 private:
     std::string m_cmd;
@@ -237,12 +227,6 @@ public:
      */
     SpaceControlHandler* handler();
     
-    //! Get the space command serializer
-    /*!
-     * \returns the space command serializer
-     */
-    SpaceCommandSerializer* serializer();
-
     //! Create a space command sink with a new session.
     /*!
      * \param peer The communication peer for the session.
@@ -251,14 +235,12 @@ public:
     SpaceCommandSink* create_sink(gloox::JID peer);
 
 protected:
-    //! Parse an XMPP message body
+    //! Get the space command serializer
     /*!
-     * \param body The message body
-     * \returns A Space Command representation of the message body.
-     * \throws SpaceCommandFormatException if the body could not be parsed.
+     * \returns the space command serializer
      */
-    SpaceCommand parseMessage(std::string body) throw(SpaceCommandFormatException);
-
+    SpaceCommandSerializer* serializer();
+  
 private:
     gloox::Client* m_client;
     SpaceControlHandler* m_hnd;
