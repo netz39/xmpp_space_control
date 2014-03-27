@@ -18,24 +18,57 @@
 #include "i2chandler.h"
 
 #include <iostream>
+#include <sstream>
 
 using namespace xmppsc;
 
-void I2CHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) {
-    std::cout << "Got command " << sc.cmd() << " from " << peer.full() << std::endl;
 
-    xmppsc::SpaceCommand response("Hallo Welt!",
-                                  xmppsc::SpaceCommand::space_command_params());
+CommandMethod::CommandMethod(CommandMethod::t_command_set _commands)
+    : m_commands(_commands) {}
 
-    sink->sendSpaceCommand(&response);
-
-    try {
-        xmppsc::SpaceCommand::space_command_params params;
-        params["id"] = sc.param("id");
-        xmppsc::SpaceCommand idcmd("id", params);
-        sink->sendSpaceCommand(&idcmd);
-    } catch (std::out_of_range &oor) {
-        std::cerr << "Parameter id is not available!" << std::endl;
-    }
-
+CommandMethod::CommandMethod(const std::string _command) {
+    m_commands.insert(_command);
 }
+
+
+CommandMethod::t_command_set CommandMethod::command_set() {
+    return m_commands;
+}
+
+
+I2CHandler::~I2CHandler() {}
+
+void I2CHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) {
+    const std::string cmd = sc.cmd();
+    try {
+        std::cout << "Got command " << cmd << " from " << peer.full() << std::endl;
+
+        CommandMethod* method = m_methods.at(cmd);
+
+        if (method)
+            method->handleSpaceCommand(peer, sc, sink);
+        else
+            std::cerr << "Assertion error: Method not found, but did not throw an exception!" << std::endl;
+    } catch (std::out_of_range &oor) {
+        SpaceCommand::space_command_params par;
+        par["what"] = oor.what();
+        std::stringstream s;
+        s << "Unknown command: " << cmd;
+        par["text"] = s.str();
+        SpaceCommand ex("exception", par);
+        sink->sendSpaceCommand(&ex);
+    }
+}
+
+void I2CHandler::add_method(CommandMethod* method) {
+    CommandMethod::t_command_set::iterator iter;
+
+    for (iter =  method->command_set().begin();
+            iter != method->command_set().end(); iter++) {
+        std::cout << "Adding command " << *iter << " from method." << std::endl;
+        m_methods[*iter] = method;
+    }
+}
+
+
+

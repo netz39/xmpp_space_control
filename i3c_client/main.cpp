@@ -5,6 +5,36 @@
 
 #include "i2chandler.h"
 
+class TestMethod : public xmppsc::CommandMethod {
+public:
+    TestMethod();
+    virtual ~TestMethod();
+
+    virtual void handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink);
+};
+
+TestMethod::TestMethod(): CommandMethod("test") {
+}
+
+TestMethod::~TestMethod() {}
+
+void TestMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
+    xmppsc::SpaceCommand response("Hallo Welt!",
+                                  xmppsc::SpaceCommand::space_command_params());
+
+    sink->sendSpaceCommand(&response);
+
+    try {
+        xmppsc::SpaceCommand::space_command_params params;
+        params["id"] = sc.param("id");
+        xmppsc::SpaceCommand idcmd("id", params);
+        sink->sendSpaceCommand(&idcmd);
+    } catch (std::out_of_range &oor) {
+        std::cerr << "Parameter id is not available!" << std::endl;
+    }
+}
+
+
 int main(int argc, char **argv) {
     gloox::Client* client=0;
     try {
@@ -15,10 +45,14 @@ int main(int argc, char **argv) {
         return (-1);
     }
 
+    xmppsc::I2CHandler* i2ch = new xmppsc::I2CHandler();
+    TestMethod* m = new TestMethod();
+    i2ch->add_method(m);
 
-    if (client) {      
-        xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, new xmppsc::I2CHandler(), 
-									 new xmppsc::TextSpaceCommandSerializer());
+
+    if (client) {
+        xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
+                new xmppsc::TextSpaceCommandSerializer());
 
         if (!client->connect(true))
             std::cerr << "could not connect!" << std::endl;
