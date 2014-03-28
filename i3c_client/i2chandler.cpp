@@ -23,17 +23,6 @@
 using namespace xmppsc;
 
 
-CommandMethod::CommandMethod(CommandMethod::t_command_set _commands)
-    : m_commands(_commands) {}
-
-CommandMethod::CommandMethod(const std::string _command) {
-    m_commands.insert(_command);
-}
-
-
-CommandMethod::t_command_set CommandMethod::command_set() {
-    return m_commands;
-}
 
 
 I2CHandler::~I2CHandler() {}

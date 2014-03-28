@@ -200,6 +200,19 @@ void Sink::sendSpaceCommand(SpaceCommand* sc) {
 }
 
 
+CommandMethod::CommandMethod(CommandMethod::t_command_set _commands)
+    : m_commands(_commands) {}
+
+CommandMethod::CommandMethod(const std::string _command) {
+    m_commands.insert(_command);
+}
+
+
+CommandMethod::t_command_set CommandMethod::command_set() {
+    return m_commands;
+}
+
+
 SpaceControlClient::SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser)
     : m_client(_client), m_hnd(_hnd), m_ser(_ser) {
     if (_client)

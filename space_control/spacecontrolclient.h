@@ -21,6 +21,7 @@
 #include <string>
 #include <map>
 #include <stdexcept>
+#include <set>
 
 #include <gloox/jid.h>
 #include <gloox/client.h>
@@ -183,6 +184,43 @@ public:
      * \param sink The sink for response commands.
      */
     virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) = 0;
+};
+
+//! Handler for a set of commands.
+class CommandMethod : public xmppsc::SpaceControlHandler {
+public:
+    //! A set for command names
+    /*!
+     * A convenience declaration to ease code interpretation.
+     */
+    typedef std::set<std::string> t_command_set;
+
+    //! Create a command method for a set of commands.
+    /*!
+     * \param _commands the set of commands understood by this method.
+     */
+    CommandMethod(t_command_set _commands);
+
+    //! Create a command method for a single command.
+    /*!
+     * \param _command the command understood by this method
+     */
+    CommandMethod(const std::string _command);
+
+    //! Get the command set.
+    /*!
+     * \returns the set of commands available from this method.
+     */
+    t_command_set command_set();
+
+    //! Override to actually do something with the command.
+    /*!
+     * \sa xmppsc::SpaceControlHandler
+     */
+    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) = 0;
+
+private:
+    t_command_set m_commands;
 };
 
 
