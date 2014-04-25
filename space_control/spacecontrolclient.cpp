@@ -242,13 +242,19 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             SpaceCommand::space_command_params par;
             par["what"] = scfe.what();
             par["body"] = scfe.body();
+	    
             // add line number if available
             if (scfe.line_number()) {
-                // it would be nicer to use std::to_string here, when available
+// use std::to_string if available
+#ifdef COMPILER_SUPPORTS_CXX11
+	    par["line number"] = std::to_string(scfe.line_number());
+#else // COMPILER_SUPPORTS_CXX11
                 std::stringstream s;
                 s << scfe.line_number();
                 par["line number"] = s.str();
+#endif // COMPILER_SUPPORTS_CXX11
             }
+            
             SpaceCommand ex("exception", par);
 	    
             session->send(serializer()->to_body(&ex));
