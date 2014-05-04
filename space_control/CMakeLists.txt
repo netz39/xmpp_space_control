@@ -14,7 +14,7 @@ else()
 endif()
 
 
-add_executable(xmpp_space_control main.cpp configuredclientfactory.cpp spacecontrolclient.cpp daemon.cpp)
+add_executable(xmpp_space_control main.cpp configuredclientfactory.cpp spacecontrolclient.cpp daemon.cpp methodhandler.cpp)
 
 find_library(GLOOX_LIBRARY gloox)
 target_link_libraries(xmpp_space_control ${GLOOX_LIBRARY})
