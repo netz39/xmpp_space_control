@@ -3,7 +3,7 @@ project(i3c_client)
 cmake_minimum_required(VERSION 2.8)
 
 
-add_executable(i3c_client main.cpp                ../space_control/configuredclientfactory.cpp
+add_executable(i3c_client main.cpp i2cmethods.cpp ../space_control/configuredclientfactory.cpp
                                                   ../space_control/spacecontrolclient.cpp
                                                   ../space_control/methodhandler.cpp)
 

@@ -5,6 +5,9 @@
 #include "../space_control/methodhandler.h"
 
 
+#include "i2cmethods.h"
+
+
 class TestMethod : public xmppsc::CommandMethod {
 public:
     TestMethod();
@@ -48,6 +51,9 @@ int main(int argc, char **argv) {
     xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
     TestMethod* m = new TestMethod();
     i2ch->add_method(m);
+    
+    i2ch->add_method(new xmppsc::I2CReadMethod());
+    i2ch->add_method(new xmppsc::I2CWriteMethod());
 
 
     if (client) {
