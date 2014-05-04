@@ -18,6 +18,45 @@
 
 #include "methodhandler.h"
 
+#include <iostream>
+#include <sstream>
+
+using namespace xmppsc;
+
+
+MethodHandler::~MethodHandler() {}
+
+void MethodHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) {
+    const std::string cmd = sc.cmd();
+    try {
+        std::cout << "Got command " << cmd << " from " << peer.full() << std::endl;
+
+        CommandMethod* method = m_methods.at(cmd);
+
+        if (method)
+            method->handleSpaceCommand(peer, sc, sink);
+        else
+            std::cerr << "Assertion error: Method not found, but did not throw an exception!" << std::endl;
+    } catch (std::out_of_range &oor) {
+        SpaceCommand::space_command_params par;
+        par["what"] = oor.what();
+        std::stringstream s;
+        s << "Unknown command: " << cmd;
+        par["text"] = s.str();
+        SpaceCommand ex("exception", par);
+        sink->sendSpaceCommand(&ex);
+    }
+}
+
+void MethodHandler::add_method(CommandMethod* method) {
+    CommandMethod::t_command_set::iterator iter;
+
+    for (iter =  method->command_set().begin();
+            iter != method->command_set().end(); iter++) {
+        std::cout << "Adding command " << *iter << " from method." << std::endl;
+        m_methods[*iter] = method;
+    }
+}
 
 
 

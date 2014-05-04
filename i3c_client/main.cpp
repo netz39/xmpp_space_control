@@ -2,8 +2,8 @@
 
 #include "../space_control/configuredclientfactory.h"
 #include "../space_control/spacecontrolclient.h"
+#include "../space_control/methodhandler.h"
 
-#include "i2chandler.h"
 
 class TestMethod : public xmppsc::CommandMethod {
 public:
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
         return (-1);
     }
 
-    xmppsc::I2CHandler* i2ch = new xmppsc::I2CHandler();
+    xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
     TestMethod* m = new TestMethod();
     i2ch->add_method(m);
 

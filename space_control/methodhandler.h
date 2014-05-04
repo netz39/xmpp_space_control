@@ -16,8 +16,35 @@
 #ifndef METHODHANDLER_H__
 #define METHODHANDLER_H__
 
+#include "spacecontrolclient.h"
+
+#include <string>
+#include <map>
+
 namespace xmppsc {
+
   
+  
+//! Method handler; Handler for a specific command name set.
+class MethodHandler : public xmppsc::SpaceControlHandler {
+public:
+    virtual ~MethodHandler();
+
+    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
+
+    //! Add a method to the handler
+    /*!
+     * \param method a pointer to the added method; ownership is transferred to the handler.
+     */
+    //TODO std::auto_ptr ?
+    void add_method(CommandMethod* method);
+
+private:
+    std::map<std::string, CommandMethod*> m_methods;
+};
+
+
+
 }
 
 
