@@ -33,9 +33,17 @@ void MethodHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCo
 
         CommandMethod* method = m_methods.at(cmd);
 
-        if (method)
-            method->handleSpaceCommand(peer, sc, sink);
-        else
+        if (method) {
+            try {
+                method->handleSpaceCommand(peer, sc, sink);
+            } catch (MissingCommandParameterException &mcp) {
+                SpaceCommand::space_command_params par;
+                par["what"] = mcp.what();
+		par["parameter"] = mcp.name();
+                SpaceCommand ex("exception", par);
+                sink->sendSpaceCommand(&ex);
+            }
+        } else
             std::cerr << "Assertion error: Method not found, but did not throw an exception!" << std::endl;
     } catch (std::out_of_range &oor) {
         SpaceCommand::space_command_params par;

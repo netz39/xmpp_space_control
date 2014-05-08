@@ -47,15 +47,19 @@ int SpaceCommandFormatException::line_number() const throw() {
 
 MissingCommandParameterException::MissingCommandParameterException(
     const std::string _name)
-    : m_name(_name) {}
+    : m_name(_name)
+{
+    std::stringstream msg;
+    msg << "Missing parameter: " << m_name;
+    m_what = msg.str();
+
+}
 
 MissingCommandParameterException::~MissingCommandParameterException() throw() {}
 
 const char* MissingCommandParameterException::what() const throw()
 {
-    std::stringstream msg;
-    msg << "Missing parameter: " << m_name;
-    return msg.str().c_str();
+    return m_what.c_str();
 }
 
 const char* MissingCommandParameterException::name() const throw()

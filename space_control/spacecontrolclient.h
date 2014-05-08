@@ -101,6 +101,12 @@ public:
 
 private:
     std::string m_name;
+    /* 
+     * The message for what() is functional dependent on m_name, 
+     * but must be stored here due to scope issues. Assembly is
+     * done in the constructor.
+     */
+    std::string m_what;
 };
 
 

@@ -30,6 +30,11 @@ class MethodHandler : public xmppsc::SpaceControlHandler {
 public:
     virtual ~MethodHandler();
 
+    /**
+     * Call the right method handler for the space command if available. If 
+     * the method handler throws a MissingCommandParameterException this 
+     * exception is sent back via the XMPP channel.
+     */
     virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
 
     //! Add a method to the handler
