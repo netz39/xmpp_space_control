@@ -44,6 +44,26 @@ int SpaceCommandFormatException::line_number() const throw() {
     return m_line_number;
 }
 
+
+MissingCommandParameterException::MissingCommandParameterException(
+    const std::string _name)
+    : m_name(_name) {}
+
+MissingCommandParameterException::~MissingCommandParameterException() throw() {}
+
+const char* MissingCommandParameterException::what() const throw()
+{
+    std::stringstream msg;
+    msg << "Missing parameter: " << m_name;
+    return msg.str().c_str();
+}
+
+const char* MissingCommandParameterException::name() const throw()
+{
+    return m_name.c_str();
+}
+
+
 SpaceCommand::SpaceCommand(const std::string _cmd,
                            std::map<const std::string, std::string> _params)
     : m_cmd(_cmd), m_params(_params) {}
@@ -52,8 +72,14 @@ std::string SpaceCommand::cmd() {
     return this->m_cmd;
 }
 
-std::string SpaceCommand::param(const std::string key) throw(std::out_of_range) {
-    return m_params.at(key);
+const std::string SpaceCommand::param(const std::string key)
+throw(MissingCommandParameterException) {
+    try {
+        const std::string _value = m_params.at(key);
+        return _value;
+    } catch (std::out_of_range &oor) {
+        throw MissingCommandParameterException(key);
+    }
 }
 
 SpaceCommand::space_command_params SpaceCommand::params() {
@@ -175,8 +201,8 @@ throw(SpaceCommandFormatException) {
 // local helper class
 class Sink : public SpaceCommandSink {
 public:
-    Sink(gloox::MessageSession* _session, SpaceCommandSerializer* _ser, bool _shared=false) 
-    : m_session(_session), m_ser(_ser), m_shared(_shared) {}
+    Sink(gloox::MessageSession* _session, SpaceCommandSerializer* _ser, bool _shared=false)
+        : m_session(_session), m_ser(_ser), m_shared(_shared) {}
     virtual ~Sink();
 
     virtual void sendSpaceCommand(SpaceCommand* sc);
@@ -242,21 +268,21 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             SpaceCommand::space_command_params par;
             par["what"] = scfe.what();
             par["body"] = scfe.body();
-	    
+
             // add line number if available
             if (scfe.line_number()) {
 // use std::to_string if available
 #ifdef COMPILER_SUPPORTS_CXX11
-	    par["line number"] = std::to_string(scfe.line_number());
+                par["line number"] = std::to_string(scfe.line_number());
 #else // COMPILER_SUPPORTS_CXX11
                 std::stringstream s;
                 s << scfe.line_number();
                 par["line number"] = s.str();
 #endif // COMPILER_SUPPORTS_CXX11
             }
-            
+
             SpaceCommand ex("exception", par);
-	    
+
             session->send(serializer()->to_body(&ex));
         }
     //TODO else warn
@@ -271,7 +297,7 @@ SpaceControlHandler* SpaceControlClient::handler() {
 }
 
 SpaceCommandSerializer* SpaceControlClient::serializer() {
-  return this->m_ser;
+    return this->m_ser;
 }
 
 

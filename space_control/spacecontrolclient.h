@@ -78,6 +78,32 @@ private:
     int m_line_number;
 };
 
+
+//! Exception for missing command parameters.
+class MissingCommandParameterException : public std::exception {
+public:
+    //! Create a new exception
+    /*!
+     * \param _name        The name of the missing parameter.
+     */
+    MissingCommandParameterException(const std::string _name);
+
+    //! Virtual destructor derrived from std::exception.
+    virtual ~MissingCommandParameterException() throw();
+
+    //! Get the exception message.
+    /*!
+     * \returns the exception message
+     */
+    virtual const char* what() const throw();
+
+    virtual const char* name() const throw();
+
+private:
+    std::string m_name;
+};
+
+
 //! Space Command representation.
 /*!
  * This class represents a Space Command, consisting of the issuing/receiving
@@ -108,7 +134,8 @@ public:
      * \returns The value for the provided key.
      * \throws std::out_of_range if the parameter does not exist.
      */
-    std::string param(const std::string key) throw(std::out_of_range);
+    const std::string param(const std::string key)
+      throw(MissingCommandParameterException);
 
     space_command_params params();
 
@@ -143,11 +170,11 @@ public:
 class TextSpaceCommandSerializer : public SpaceCommandSerializer {
 public:
     TextSpaceCommandSerializer();
-    
+
     virtual ~TextSpaceCommandSerializer();
 
     virtual std::string to_body(SpaceCommand* cmd);
-    
+
     virtual SpaceCommand to_command(const std::string body)
     throw(SpaceCommandFormatException);
 };
@@ -264,7 +291,7 @@ public:
      * \returns the space control handler used by this space control client.
      */
     SpaceControlHandler* handler();
-    
+
     //! Create a space command sink with a new session.
     /*!
      * \param peer The communication peer for the session.
@@ -278,7 +305,7 @@ protected:
      * \returns the space command serializer
      */
     SpaceCommandSerializer* serializer();
-  
+
 private:
     gloox::Client* m_client;
     SpaceControlHandler* m_hnd;
