@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 
 
 add_executable(i3c_client main.cpp i2cmethods.cpp 
-				   i2cendpoint.cpp
+				   i2cendpoint.cpp i2cendpoint_dummy.cpp
 						  ../space_control/configuredclientfactory.cpp
                                                   ../space_control/spacecontrolclient.cpp
                                                   ../space_control/methodhandler.cpp)

@@ -41,5 +41,4 @@ const char* I2CEndpointException::what() const throw()
 }
 
 
-
 // End of file

@@ -6,6 +6,7 @@
 
 
 #include "i2cmethods.h"
+#include "i2cendpoint.h"
 
 
 class TestMethod : public xmppsc::CommandMethod {
@@ -39,6 +40,16 @@ void TestMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xm
 
 
 int main(int argc, char **argv) {
+  xmppsc::I2CEndpoint i2cep(0x12);
+  i2cep.setup();
+  
+  std::cout << std::hex << "0x" << i2cep.write_reg_8(0x22, 0x01) << std::endl;
+  
+  i2cep.close();
+  
+  return 0;
+  
+  
     gloox::Client* client=0;
     try {
         xmppsc::ConfiguredClientFactory ccf("spacecontrol.config");

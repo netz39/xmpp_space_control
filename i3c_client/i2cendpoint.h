@@ -73,6 +73,8 @@ public:
      */
     // TODO check parameter type, 8 bits are sufficient
     I2CEndpoint(const int address) throw (std::out_of_range);
+    
+    // TODO destructor
 
     //! Return the address for this endpoint.
     /*!
