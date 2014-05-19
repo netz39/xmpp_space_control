@@ -24,6 +24,7 @@ namespace xmppsc {
 
 //! Exception during I2C communication via an endpoint.
 class I2CEndpointException : public std::exception {
+public:  
     //! Create a new exception.
     /*!
      * @param address Device address of the I2C peer.
