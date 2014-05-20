@@ -40,18 +40,12 @@ void TestMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xm
 
 
 int main(int argc, char **argv) {
-  xmppsc::I2CEndpointBroker broker;
-  
-  xmppsc::I2CEndpoint* ep = broker.endpoint(0x22);
-  
-  
-  // Send a double beep
-  std::cout << std::hex << "0x" << ep->read_reg_16(0x95) << std::endl;
-  
-  
-  return 0;
-  
-  
+    xmppsc::I2CEndpointBroker*  broker = new xmppsc::I2CEndpointBroker();
+
+    xmppsc::I2CEndpoint* ep = broker->endpoint(0x22);
+    // Send a double beep
+    std::cout << std::hex << "0x" << ep->read_reg_16(0x95) << std::endl;
+
     gloox::Client* client=0;
     try {
         xmppsc::ConfiguredClientFactory ccf("spacecontrol.config");
@@ -64,7 +58,7 @@ int main(int argc, char **argv) {
     xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
     TestMethod* m = new TestMethod();
     i2ch->add_method(m);
-    
+
     i2ch->add_method(new xmppsc::I2CReadMethod());
     i2ch->add_method(new xmppsc::I2CWriteMethod());
 
@@ -78,6 +72,8 @@ int main(int argc, char **argv) {
 
         delete client;
     }
+
+    delete broker;
 
     return 0;
 }
