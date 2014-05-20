@@ -76,7 +76,6 @@ public:
     // TODO check parameter type, 8 bits are sufficient
     I2CEndpoint(const int address) throw (std::out_of_range);
     
-    I2CEndpoint(const I2CEndpoint& other);
     
     // TODO destructor
 
@@ -156,6 +155,8 @@ protected:
     int _fd() const throw();
 
 private:
+   I2CEndpoint(const I2CEndpoint& other);
+
     const int m_address;
     int m_fd;
 };
@@ -167,11 +168,11 @@ public:
     ~I2CEndpointBroker() throw(I2CEndpointException);
 
     //! Create (if necessary) and return an I2C endpoint for the specified address.
-    I2CEndpoint& endpoint(const int address) throw(I2CEndpointException, std::out_of_range);
+    I2CEndpoint* endpoint(const int address) throw(I2CEndpointException, std::out_of_range);
 
     void free_all_endpoints() throw(I2CEndpointException);
 private:
-    typedef std::map<int, I2CEndpoint> endpoint_map;
+    typedef std::map<int, I2CEndpoint*> endpoint_map;
     endpoint_map endpoints;
 };
 

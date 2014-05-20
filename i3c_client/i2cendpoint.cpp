@@ -54,26 +54,28 @@ I2CEndpointBroker::~I2CEndpointBroker() throw(I2CEndpointException)
     free_all_endpoints();
 }
 
-I2CEndpoint& I2CEndpointBroker::endpoint(const int address) throw(I2CEndpointException, std::out_of_range)
+I2CEndpoint* I2CEndpointBroker::endpoint(const int address) throw(I2CEndpointException, std::out_of_range)
 {
     // try to get endpoint from the map
     endpoint_map::iterator it = endpoints.find(address);
 
     if (it == endpoints.end()) {
         // none found, create and setup
-        I2CEndpoint ep(address);
-        ep.setup();
+        I2CEndpoint* ep = new I2CEndpoint(address);
+        ep->setup();
 
         // store and return
         std::pair<endpoint_map::iterator, bool> res =
             endpoints.insert(endpoint_map::value_type(address, ep));
 
-        if (!res.second)
+        if (!res.second) {
+            delete ep;
             throw I2CEndpointException(address, 0, "Could not store endpoint to broker!");
+        }
 
-        return res.first->second;
+        return ep;
     }
-    
+
     return it->second;
 }
 
@@ -81,7 +83,9 @@ void I2CEndpointBroker::free_all_endpoints() throw(I2CEndpointException)
 {
     // close all endpoints
     for (endpoint_map::iterator it = endpoints.begin(); it != endpoints.end(); it++) {
-        it->second.close();
+      I2CEndpoint* ep = it->second;
+        ep->close();
+	delete ep;
         endpoints.erase(it);
     }
 }

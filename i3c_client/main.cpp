@@ -42,11 +42,11 @@ void TestMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xm
 int main(int argc, char **argv) {
   xmppsc::I2CEndpointBroker broker;
   
-  xmppsc::I2CEndpoint ep = broker.endpoint(0x22);
+  xmppsc::I2CEndpoint* ep = broker.endpoint(0x22);
   
   
   // Send a double beep
-  std::cout << std::hex << "0x" << ep.read_reg_16(0x95) << std::endl;
+  std::cout << std::hex << "0x" << ep->read_reg_16(0x95) << std::endl;
   
   
   return 0;
