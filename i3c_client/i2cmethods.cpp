@@ -29,13 +29,12 @@ namespace
 
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 {
-    std::istringstream conv(hex);
-    conv.exceptions(std::istringstream::failbit | std::istringstream::badbit);
-
+    std::stringstream conv;
+    conv << std::hex << hex;
+    
     int i;
-    conv >> std::hex >> i;
 
-    if (!conv.good()) {
+    if (! (conv >> i)) {
         std::ostringstream msg("");
         msg << "Error on hex value conversion (value " << hex << ")!";
         throw std::invalid_argument(msg.str());
