@@ -62,6 +62,7 @@ void MethodHandler::add_method(CommandMethod* method) {
     for (iter =  method->command_set().begin();
             iter != method->command_set().end(); iter++) {
         std::cout << "Adding command " << *iter << " from method." << std::endl;
+    	// TODO delete old methods, if already set
         m_methods[*iter] = method;
     }
 }
