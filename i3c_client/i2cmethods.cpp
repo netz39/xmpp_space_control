@@ -24,9 +24,6 @@
 #include <iomanip>
 #include <sstream>
 
-using namespace xmppsc;
-
-// local helper functions
 namespace
 {
 
@@ -69,12 +66,13 @@ template< typename T > const std::string int2hex(T i)
            << std::hex << i;
     return stream.str();
 }
+} // anon namespace
 
 
-} // anonymous namespace
-
+namespace xmppsc {
 
 I2CReadMethod::I2CReadMethod(): CommandMethod("i2c.read") {}
+
 
 I2CReadMethod::~I2CReadMethod() {}
 
@@ -84,11 +82,11 @@ void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc,
 
     // get the device
     const std::string _device = sc.param("device");
-    const unsigned int device = ::hex2int(_device);
+    const unsigned int device = hex2int(_device);
 
     // get the address
     const std::string _address = sc.param("address");
-    const unsigned int address = ::hex2int(_address);
+    const unsigned int address = hex2int(_address);
 
 
     // TODO perfom read
@@ -97,9 +95,9 @@ void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc,
 
 
     xmppsc::SpaceCommand::space_command_params params;
-    params["device"] = ::int2hex(device);
-    params["address"] = ::int2hex(address);
-    params["response"] = ::int2hex(result);
+    params["device"] = int2hex(device);
+    params["address"] = int2hex(address);
+    params["response"] = int2hex(result);
     xmppsc::SpaceCommand idcmd("i2c.update", params);
     sink->sendSpaceCommand(&idcmd);
 }
@@ -115,15 +113,15 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc
 
     // get the device
     const std::string _device = sc.param("device");
-    const unsigned int device = ::hex2int(_device);
+    const unsigned int device = hex2int(_device);
 
     // get the address
     const std::string _address = sc.param("address");
-    const unsigned int address = ::hex2int(_address);
+    const unsigned int address = hex2int(_address);
 
     // get the value
     const std::string _value = sc.param("value");
-    const unsigned int value = ::hex2int(_value);
+    const unsigned int value = hex2int(_value);
 
 
     // TODO perfom write
@@ -139,6 +137,8 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc
     xmppsc::SpaceCommand idcmd("i2c.update", params);
     sink->sendSpaceCommand(&idcmd);
 }
+
+} // namespace xmppsc
 
 // End of file
 
