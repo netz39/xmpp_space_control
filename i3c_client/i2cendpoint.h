@@ -72,34 +72,18 @@ public:
     /*!
      * @param address The I2C address of the target device.
      * @throws std::out_of_range if the address is not a valid I2C address
+     * @throw I2CEndpointException if the endpoint cannot be initialized
      */
     // TODO check parameter type, 8 bits are sufficient
-    I2CEndpoint(const int address) throw (std::out_of_range);
-    
-    
-    // TODO destructor
+    I2CEndpoint(const int address) throw (I2CEndpointException, std::out_of_range);
+
+    ~I2CEndpoint() throw();
 
     //! Return the address for this endpoint.
     /*!
      * @returns The endpoint device address.
      */
     const int address() const throw();
-
-    //! Set up the I2C connection for further communication.
-    /*!
-     * This initialises the I2C system with your given device identifier.
-     * The ID is the I2C number of the device and you can use the
-     * i2cdetect program to find this out.
-     *
-     * @throws I2CEndpointException if setup fails.
-     */
-    void setup() throw(I2CEndpointException);
-
-    //! Close the connection to the I2C device and cleanup all resources.
-    /*!
-     * @throws I2CEndpointException if the cleanup fails.
-     */
-    void close() throw(I2CEndpointException);
 
     //! Simple device read_reg_16
     /*!
@@ -155,7 +139,8 @@ protected:
     int _fd() const throw();
 
 private:
-   I2CEndpoint(const I2CEndpoint& other);
+    // No Copies of this instance!
+    I2CEndpoint(const I2CEndpoint& other);
 
     const int m_address;
     int m_fd;
@@ -165,15 +150,16 @@ private:
 class I2CEndpointBroker {
 public:
     I2CEndpointBroker();
-    ~I2CEndpointBroker() throw(I2CEndpointException);
+    ~I2CEndpointBroker() throw();
 
     //! Create (if necessary) and return an I2C endpoint for the specified address.
     I2CEndpoint* endpoint(const int address) throw(I2CEndpointException, std::out_of_range);
 
-    void free_all_endpoints() throw(I2CEndpointException);
 private:
     typedef std::map<int, I2CEndpoint*> endpoint_map;
     endpoint_map endpoints;
+
+    void free_all_endpoints() throw();
 };
 
 

@@ -45,7 +45,7 @@ int __dummy_input(const std::string msg) {
 } // anon namespace
 
 
-I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
+I2CEndpoint::I2CEndpoint(const int address) throw (I2CEndpointException, std::out_of_range)
     : m_address(address), m_fd(0)
 {
     if (address < 0 || address > 0xff) {
@@ -53,10 +53,23 @@ I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
         msg << "I2C address " << address << " is out of range, must be between 0 and 0xFF!";
         throw std::out_of_range(msg.str());
     }
+    
+    m_fd = 1;
+    std::stringstream msg("");
+    msg << "I2C dummy device " << m_address << " has been set up with fd " << m_fd;
+
+    ::__dummy_message(msg.str());    
 }
 
-I2CEndpoint::I2CEndpoint(const I2CEndpoint& other)
-    : m_address(other.m_address), m_fd(other.m_fd) { }
+I2CEndpoint::~I2CEndpoint() throw()
+{
+    m_fd = 0;
+    std::stringstream msg("");
+    msg << "I2C dummy device " << m_address << " has been closed.";
+
+    ::__dummy_message(msg.str());
+}
+
 
 const int I2CEndpoint::address() const throw()
 {
@@ -67,23 +80,6 @@ int I2CEndpoint::_fd() const throw() {
     return m_fd;
 }
 
-void I2CEndpoint::setup() throw(I2CEndpointException)
-{
-    m_fd = 1;
-    std::stringstream msg("");
-    msg << "I2C dummy device " << m_address << " has been set up with fd " << m_fd;
-
-    ::__dummy_message(msg.str());
-}
-
-void I2CEndpoint::close() throw(I2CEndpointException)
-{
-    m_fd = 0;
-    std::stringstream msg("");
-    msg << "I2C dummy device " << m_address << " has been closed.";
-
-    ::__dummy_message(msg.str());
-}
 
 int I2CEndpoint::read() throw(I2CEndpointException)
 {

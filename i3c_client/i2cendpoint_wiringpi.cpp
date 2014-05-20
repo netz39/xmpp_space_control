@@ -14,7 +14,7 @@
  */
 
 /*!
- * This is the wiringPi implementation of the plattform-specific I2C 
+ * This is the wiringPi implementation of the plattform-specific I2C
  * endpoint part.
  */
 
@@ -34,7 +34,7 @@
 using namespace xmppsc;
 
 
-I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
+I2CEndpoint::I2CEndpoint(const int address) throw (I2CEndpointException, std::out_of_range)
     : m_address(address), m_fd(0)
 {
     if (address < 0 || address > 0xff) {
@@ -42,10 +42,25 @@ I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
         msg << "I2C address " << address << " is out of range, must be between 0 and 0xFF!";
         throw std::out_of_range(msg.str());
     }
+
+    // get handle for the I2C device
+    const int fd = wiringPiI2CSetup(m_address);
+
+    // check for error
+    if (fd == -1) {
+        throw I2CEndpointException(m_address, errno,
+                                   "Error on opening the I2C handle!");
+    }
+
+    // store fd
+    m_fd = fd;
 }
 
-I2CEndpoint::I2CEndpoint(const I2CEndpoint& other)
-    : m_address(other.m_address), m_fd(other.m_fd) { }
+I2CEndpoint::~I2CEndpoint() throw()
+{
+    if (::close(m_fd) == -1)
+        std::cerr << "Error on closing the I2C handle" << errno << std::endl;
+}
 
 const int I2CEndpoint::address() const throw()
 {
@@ -56,44 +71,12 @@ int I2CEndpoint::_fd() const throw() {
     return m_fd;
 }
 
-void I2CEndpoint::setup() throw(I2CEndpointException)
-{
-    // if still open, close the endpoint first
-    if (m_fd)
-        close();
-        
-    // get handle for the I2C device
-    const int fd = wiringPiI2CSetup(m_address);
-
-    // check for error
-    if (fd == -1) {
-        throw I2CEndpointException(m_address, errno, 
-                "Error on opening the I2C handle!");
-    }
-    
-    // store fd
-    m_fd = fd;
-}
-
-void I2CEndpoint::close() throw(I2CEndpointException)
-{
-    if (!m_fd)
-        return;
-        
-    if (::close(m_fd) == -1) {
-        throw I2CEndpointException(m_address, errno, 
-                "Error on closing the I2C handle!");
-    }
-    
-    m_fd = 0;
-}
-
 #define I2C_EXC(MSG) \
     if (res < 0) { \
         throw I2CEndpointException(m_address, errno, \
             (MSG)); \
     } \
-
+ 
 int I2CEndpoint::read() throw(I2CEndpointException)
 {
     const int res = wiringPiI2CRead(m_fd);
