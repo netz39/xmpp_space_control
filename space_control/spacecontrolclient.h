@@ -238,12 +238,14 @@ public:
      * \param _command the command understood by this method
      */
     CommandMethod(const std::string _command);
+    
+    virtual ~CommandMethod() throw();
 
     //! Get the command set.
     /*!
      * \returns the set of commands available from this method.
      */
-    t_command_set command_set();
+    t_command_set& command_set();
 
     //! Override to actually do something with the command.
     /*!

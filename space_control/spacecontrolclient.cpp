@@ -237,8 +237,10 @@ CommandMethod::CommandMethod(const std::string _command) {
     m_commands.insert(_command);
 }
 
+CommandMethod::~CommandMethod() throw() { }
 
-CommandMethod::t_command_set CommandMethod::command_set() {
+
+CommandMethod::t_command_set& CommandMethod::command_set() {
     return m_commands;
 }
 
