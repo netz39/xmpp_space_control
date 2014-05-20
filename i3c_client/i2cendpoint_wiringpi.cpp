@@ -26,8 +26,8 @@
 #include <string>
 #include <sstream>
 
-#include <unistd.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cerrno>
 
 #include <wiringPiI2C.h>
 
