@@ -18,7 +18,7 @@
 
 #include "i2cmethods.h"
 
-
+#include <stdexcept>
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -26,14 +26,19 @@
 
 using namespace xmppsc;
 
-const unsigned int hex2str(const std::string hex) {
+const unsigned int hex2int(const std::string hex) throw (std::invalid_argument) {
     int i;
 
-    std::stringstream conv;
-    conv << std::hex << hex;
-    if (! (conv >> i)) {
-        //TODO exception?
-        i = 0;
+    std::stringstream conv(hex);
+    conv.exceptions( std::stringstream::failbit | std::stringstream::badbit);
+
+    try {
+      conv >> std::hex >> i;
+    } catch (std::stringstream::failure e) {
+      std::stringstream msg("");
+      msg << "Exception on hex value conversion (value " << hex << "): ";
+      msg << e.what();      
+      throw std::invalid_argument(msg.str());
     }
 
     return i;
@@ -63,11 +68,11 @@ I2CReadMethod::~I2CReadMethod() {}
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
     // get the device
     const std::string _device = sc.param("device");
-    const unsigned int device = hex2str(_device);
+    const unsigned int device = hex2int(_device);
 
     // get the address
     const std::string _address = sc.param("address");
-    const unsigned int address = hex2str(_address);
+    const unsigned int address = hex2int(_address);
 
 
     // TODO perfom read
@@ -91,15 +96,15 @@ I2CWriteMethod::~I2CWriteMethod() {}
 void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
     // get the device
     const std::string _device = sc.param("device");
-    const unsigned int device = hex2str(_device);
+    const unsigned int device = hex2int(_device);
 
     // get the address
     const std::string _address = sc.param("address");
-    const unsigned int address = hex2str(_address);
+    const unsigned int address = hex2int(_address);
 
     // get the value
     const std::string _value = sc.param("value");
-    const unsigned int value = hex2str(_value);
+    const unsigned int value = hex2int(_value);
 
 
     // TODO perfom write
@@ -118,3 +123,5 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc
 
 
 // End of file
+
+
