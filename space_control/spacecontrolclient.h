@@ -209,7 +209,6 @@ public:
  */
 class SpaceControlHandler {
 public:
-    //TODO allow for multiple responses -> rather a callback interface than a response pointer
     //! Handle an incoming Space Command
     /*!
      * \param peer The communication peer as provided by GLOOX
