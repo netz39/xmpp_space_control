@@ -42,6 +42,12 @@ void MethodHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCo
 		par["parameter"] = mcp.name();
                 SpaceCommand ex("exception", par);
                 sink->sendSpaceCommand(&ex);
+            } catch (IllegalCommandParameterException &mcp) {
+                SpaceCommand::space_command_params par;
+                par["what"] = mcp.what();
+		par["parameter"] = mcp.name();
+                SpaceCommand ex("exception", par);
+                sink->sendSpaceCommand(&ex);
             }
         } else
             std::cerr << "Assertion error: Method not found, but did not throw an exception!" << std::endl;
