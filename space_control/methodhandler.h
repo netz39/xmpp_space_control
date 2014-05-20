@@ -35,7 +35,7 @@ public:
      * the method handler throws a MissingCommandParameterException this 
      * exception is sent back via the XMPP channel.
      */
-    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
 
     //! Add a method to the handler
     /*!

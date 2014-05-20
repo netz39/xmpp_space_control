@@ -202,7 +202,7 @@ public:
      * \param cmd Pointer to the space command, must not be null
      * \returns The serialized message as String
      */
-    virtual std::string to_body(SpaceCommand* cmd) = 0;
+    virtual std::string to_body(const SpaceCommand& cmd) = 0;
 
     //! De-Serialize a received Space Command
     /*!
@@ -221,7 +221,7 @@ public:
 
     virtual ~TextSpaceCommandSerializer();
 
-    virtual std::string to_body(SpaceCommand* cmd);
+    virtual std::string to_body(const SpaceCommand& cmd);
 
     virtual SpaceCommand to_command(const std::string body)
     throw(SpaceCommandFormatException);
@@ -239,7 +239,7 @@ public:
     /*!
      * \param sc The space command to be sent.
      */
-    virtual void sendSpaceCommand(SpaceCommand* sc) = 0;
+    virtual void sendSpaceCommand(const SpaceCommand& sc) = 0;
 };
 
 
@@ -257,7 +257,7 @@ public:
      * \param sc   The incoming Space Command instance.
      * \param sink The sink for response commands.
      */
-    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) = 0;
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink) = 0;
 };
 
 //! Handler for a set of commands.
@@ -293,7 +293,7 @@ public:
     /*!
      * \sa xmppsc::SpaceControlHandler
      */
-    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) = 0;
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink) = 0;
 
 private:
     t_command_set m_commands;

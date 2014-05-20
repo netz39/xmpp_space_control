@@ -26,7 +26,7 @@ using namespace xmppsc;
 
 MethodHandler::~MethodHandler() {}
 
-void MethodHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) {
+void MethodHandler::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink) {
     const std::string cmd = sc.cmd();
     try {
         std::cout << "Got command " << cmd << " from " << peer.full() << std::endl;
@@ -41,13 +41,13 @@ void MethodHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCo
                 par["what"] = mcp.what();
 		par["parameter"] = mcp.name();
                 SpaceCommand ex("exception", par);
-                sink->sendSpaceCommand(&ex);
+                sink->sendSpaceCommand(ex);
             } catch (IllegalCommandParameterException &mcp) {
                 SpaceCommand::space_command_params par;
                 par["what"] = mcp.what();
 		par["parameter"] = mcp.name();
                 SpaceCommand ex("exception", par);
-                sink->sendSpaceCommand(&ex);
+                sink->sendSpaceCommand(ex);
             }
         } else
             std::cerr << "Assertion error: Method not found, but did not throw an exception!" << std::endl;
@@ -58,7 +58,7 @@ void MethodHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCo
         s << "Unknown command: " << cmd;
         par["text"] = s.str();
         SpaceCommand ex("exception", par);
-        sink->sendSpaceCommand(&ex);
+        sink->sendSpaceCommand(ex);
     }
 }
 

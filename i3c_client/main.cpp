@@ -14,7 +14,7 @@ public:
     TestMethod();
     virtual ~TestMethod() throw();
 
-    virtual void handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink);
+    virtual void handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink);
 };
 
 TestMethod::TestMethod(): CommandMethod("test") {
@@ -22,17 +22,17 @@ TestMethod::TestMethod(): CommandMethod("test") {
 
 TestMethod::~TestMethod() throw() {}
 
-void TestMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
+void TestMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
     xmppsc::SpaceCommand response("Hallo Welt!",
                                   xmppsc::SpaceCommand::space_command_params());
 
-    sink->sendSpaceCommand(&response);
+    sink->sendSpaceCommand(response);
 
     try {
         xmppsc::SpaceCommand::space_command_params params;
         params["id"] = sc.param("id");
         xmppsc::SpaceCommand idcmd("id", params);
-        sink->sendSpaceCommand(&idcmd);
+        sink->sendSpaceCommand(idcmd);
     } catch (std::out_of_range &oor) {
         std::cerr << "Parameter id is not available!" << std::endl;
     }

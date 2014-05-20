@@ -61,7 +61,7 @@ template< typename T > const std::string int2hex(T i)
     return stream.str();
 }
 
-int retrieveHexParameter(const std::string& parameter, xmppsc::SpaceCommand& sc, bool required=true, int def=0)
+int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required=true, int def=0)
 throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameterException) {
     try {
         const std::string _val = sc.param(parameter);
@@ -102,7 +102,7 @@ I2CReadMethod::I2CReadMethod(I2CEndpointBroker* broker): I2CMethodBase("i2c.read
 
 I2CReadMethod::~I2CReadMethod() throw () {}
 
-void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink *sink)
+void I2CReadMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
 {
   
     // get parameters
@@ -123,7 +123,7 @@ void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc,
     params["register"] = int2hex(reg);
     params["response"] = int2hex(result);
     xmppsc::SpaceCommand idcmd("i2c.update", params);
-    sink->sendSpaceCommand(&idcmd);
+    sink->sendSpaceCommand(idcmd);
 }
 
 
@@ -131,7 +131,7 @@ I2CWriteMethod::I2CWriteMethod(I2CEndpointBroker* broker): I2CMethodBase("i2c.wr
 
 I2CWriteMethod::~I2CWriteMethod() throw () {}
 
-void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink *sink)
+void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
 {
     // get parameters
     const unsigned int device = retrieveHexParameter("device", sc);
@@ -152,7 +152,7 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc
     params["value"] = ::int2hex(data);
     params["response"] = ::int2hex(result);
     xmppsc::SpaceCommand idcmd("i2c.update", params);
-    sink->sendSpaceCommand(&idcmd);
+    sink->sendSpaceCommand(idcmd);
 }
 
 } // namespace xmppsc

@@ -129,13 +129,13 @@ TextSpaceCommandSerializer::TextSpaceCommandSerializer() {}
 
 TextSpaceCommandSerializer::~TextSpaceCommandSerializer() {}
 
-std::string TextSpaceCommandSerializer::to_body(SpaceCommand* cmd) {
+std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd) {
 
     // build parameter list
     std::stringstream pars("");
 
-    SpaceCommand::space_command_params params = cmd->params();
-    SpaceCommand::space_command_params::iterator iter;
+    SpaceCommand::space_command_params params = cmd.params();
+    SpaceCommand::space_command_params::const_iterator iter;
 
     for (iter =  params.begin(); iter != params.end(); iter++) {
         // count lines in parameter value
@@ -161,7 +161,7 @@ std::string TextSpaceCommandSerializer::to_body(SpaceCommand* cmd) {
 
     // build message body
     std::stringstream body;
-    body << cmd->cmd();
+    body << cmd.cmd();
     if (!pars.str().empty())
         body << std::endl << pars.str();
 
@@ -240,7 +240,7 @@ public:
         : m_session(_session), m_ser(_ser), m_shared(_shared) {}
     virtual ~Sink();
 
-    virtual void sendSpaceCommand(SpaceCommand* sc);
+    virtual void sendSpaceCommand(const SpaceCommand& sc);
 
 private:
     SpaceCommandSerializer* m_ser;
@@ -253,8 +253,8 @@ Sink::~Sink() {
         delete m_session;
 }
 
-void Sink::sendSpaceCommand(SpaceCommand* sc) {
-    if (m_session && sc) {
+void Sink::sendSpaceCommand(const SpaceCommand& sc) {
+    if (m_session) {
         m_session->send(m_ser->to_body(sc));
     }
     //TODO else
@@ -320,7 +320,7 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
 
             SpaceCommand ex("exception", par);
 
-            session->send(serializer()->to_body(&ex));
+            session->send(serializer()->to_body(ex));
         }
     //TODO else warn
 }

@@ -42,7 +42,7 @@ class I2CReadMethod : public I2CMethodBase {
     I2CReadMethod(I2CEndpointBroker* broker);
     virtual ~I2CReadMethod() throw();
     
-    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
 };
 
 class I2CWriteMethod : public I2CMethodBase {
@@ -50,7 +50,7 @@ class I2CWriteMethod : public I2CMethodBase {
     I2CWriteMethod(I2CEndpointBroker* broker);
     virtual ~I2CWriteMethod() throw();
     
-    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
 };
 }
 #endif // I2CMETHODS_H__

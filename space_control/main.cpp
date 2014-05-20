@@ -31,25 +31,25 @@ class I2CHandler : public SpaceControlHandler {
 public:
     virtual ~I2CHandler() throw();
   
-    virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
 };
 
 I2CHandler::~I2CHandler() throw() {}
 
 
-void I2CHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) {
+void I2CHandler::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink) {
     cout << "Got command " << sc.cmd() << " from " << peer.full() << endl;
 
     xmppsc::SpaceCommand response("Hallo Welt!",
                                   xmppsc::SpaceCommand::space_command_params());
 
-    sink->sendSpaceCommand(&response);
+    sink->sendSpaceCommand(response);
 
     try {
         xmppsc::SpaceCommand::space_command_params params;
         params["id"] = sc.param("id");
         xmppsc::SpaceCommand idcmd("id", params);
-        sink->sendSpaceCommand(&idcmd);
+        sink->sendSpaceCommand(idcmd);
     } catch (std::out_of_range &oor) {
         cerr << "Parameter id is not available!" << endl;
     }
