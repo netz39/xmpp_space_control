@@ -27,26 +27,21 @@
 namespace
 {
 
-const unsigned int hex2int(const std::string hex) throw(std::invalid_argument);
-template< typename T > const std::string int2hex(T i);
-
-const unsigned int hex2int(const std::string hex) throw(std::invalid_argument)
+unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 {
-    int i;
-
-    std::stringstream conv(hex);
-    conv.exceptions(std::stringstream::failbit | std::stringstream::badbit);
-
     try {
+	std::stringstream conv(hex);
+	conv.exceptions(std::stringstream::failbit | std::stringstream::badbit);
+
+	int i;
         conv >> std::hex >> i;
+	return i;
     } catch(std::stringstream::failure e) {
         std::stringstream msg("");
         msg << "Exception on hex value conversion (value " << hex << "): ";
         msg << e.what();
         throw std::invalid_argument(msg.str());
     }
-
-    return i;
 }
 
 // http://stackoverflow.com/a/5100745
