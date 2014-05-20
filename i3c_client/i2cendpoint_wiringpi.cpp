@@ -44,12 +44,12 @@ I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
     }
 }
 
-const int I2CEndpoint::address() throw()
+const int I2CEndpoint::address() const throw()
 {
     return m_address;
 }
 
-const int I2CEndpoint::_fd() throw() {
+int I2CEndpoint::_fd() const throw() {
     return m_fd;
 }
 
@@ -99,35 +99,35 @@ int I2CEndpoint::read() throw(I2CEndpointException)
 }
 
 
-int I2CEndpoint::write(int data) throw(I2CEndpointException)
+int I2CEndpoint::write(const int data) throw(I2CEndpointException)
 {
     const int res = wiringPiI2CWrite(m_fd, data);
     I2C_EXC("Error on simple I2C write!");
     return res;
 }
 
-int I2CEndpoint::read_reg_8(int reg) throw(I2CEndpointException)
+int I2CEndpoint::read_reg_8(const int reg) throw(I2CEndpointException)
 {
     const int res = wiringPiI2CReadReg8(m_fd, reg);
     I2C_EXC("Error on I2C 8-bit read!");
     return res;
 }
 
-int I2CEndpoint::read_reg_16(int reg) throw(I2CEndpointException)
+int I2CEndpoint::read_reg_16(const int reg) throw(I2CEndpointException)
 {
     const int res = wiringPiI2CReadReg16(m_fd, reg);
     I2C_EXC("Error on I2C 16-bit read!");
     return res;
 }
 
-int I2CEndpoint::write_reg_8(int reg, int data) throw(I2CEndpointException)
+int I2CEndpoint::write_reg_8(const int reg, const int data) throw(I2CEndpointException)
 {
     const int res = wiringPiI2CWriteReg8(m_fd, reg, data);
     I2C_EXC("Error on I2C 8-bit write!");
     return res;
 }
 
-int I2CEndpoint::write_reg_16(int reg, int data) throw(I2CEndpointException)
+int I2CEndpoint::write_reg_16(const int reg, const int data) throw(I2CEndpointException)
 {
     const int res = wiringPiI2CWriteReg16(m_fd, reg, data);
     I2C_EXC("Error on I2C 16-bit write!");

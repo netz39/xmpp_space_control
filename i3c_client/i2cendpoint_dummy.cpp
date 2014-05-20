@@ -55,12 +55,12 @@ I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
     }
 }
 
-const int I2CEndpoint::address() throw()
+const int I2CEndpoint::address() const throw()
 {
     return m_address;
 }
 
-const int I2CEndpoint::_fd() throw() {
+int I2CEndpoint::_fd() const throw() {
     return m_fd;
 }
 
@@ -90,7 +90,7 @@ int I2CEndpoint::read() throw(I2CEndpointException)
 }
 
 
-int I2CEndpoint::write(int data) throw(I2CEndpointException)
+int I2CEndpoint::write(const int data) throw(I2CEndpointException)
 {
     std::stringstream msg("");
     msg << "Please input simple write result (hex) for device 0x" << std::hex << m_address
@@ -99,7 +99,7 @@ int I2CEndpoint::write(int data) throw(I2CEndpointException)
 
 }
 
-int I2CEndpoint::read_reg_8(int reg) throw(I2CEndpointException)
+int I2CEndpoint::read_reg_8(const int reg) throw(I2CEndpointException)
 {
     std::stringstream msg("");
     msg << "Please input 8-bit read result (hex) for device 0x" << std::hex << m_address
@@ -107,7 +107,7 @@ int I2CEndpoint::read_reg_8(int reg) throw(I2CEndpointException)
     return ::__dummy_input(msg.str());
 }
 
-int I2CEndpoint::read_reg_16(int reg) throw(I2CEndpointException)
+int I2CEndpoint::read_reg_16(const int reg) throw(I2CEndpointException)
 {
     std::stringstream msg("");
     msg << "Please input 16-bit read result (hex) for device 0x" << std::hex << m_address
@@ -115,7 +115,7 @@ int I2CEndpoint::read_reg_16(int reg) throw(I2CEndpointException)
     return ::__dummy_input(msg.str());
 }
 
-int I2CEndpoint::write_reg_8(int reg, int data) throw(I2CEndpointException)
+int I2CEndpoint::write_reg_8(const int reg, const int data) throw(I2CEndpointException)
 {
     std::stringstream msg("");
     msg << "Please input 8-bit write result (hex) for device 0x" << std::hex << m_address
@@ -123,7 +123,7 @@ int I2CEndpoint::write_reg_8(int reg, int data) throw(I2CEndpointException)
     return ::__dummy_input(msg.str());
 }
 
-int I2CEndpoint::write_reg_16(int reg, int data) throw(I2CEndpointException)
+int I2CEndpoint::write_reg_16(const int reg, const int data) throw(I2CEndpointException)
 {
     std::stringstream msg("");
     msg << "Please input 16-bit write result (hex) for device 0x" << std::hex << m_address

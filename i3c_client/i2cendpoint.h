@@ -24,22 +24,22 @@ namespace xmppsc {
 
 //! Exception during I2C communication via an endpoint.
 class I2CEndpointException : public std::exception {
-public:  
+public:
     //! Create a new exception.
     /*!
      * @param address Device address of the I2C peer.
      * @param errno The errno from the backing I2C library
      * @param const msg an error message if available
      */
-    I2CEndpointException(const int address, const int error, const std::string msg);
+    I2CEndpointException(const int address, const int error, const std::string& msg);
 
     virtual ~I2CEndpointException() throw();
 
     //! Get the device address corresponding to this exception.
-    virtual const int address() throw();
+    virtual const int address() const throw();
 
     //! Get the error (errno) corresponding to this exception.
-    virtual const int error() throw();
+    virtual const int error() const throw();
 
     //! Get the exception message.
     /*!
@@ -74,14 +74,14 @@ public:
      */
     // TODO check parameter type, 8 bits are sufficient
     I2CEndpoint(const int address) throw (std::out_of_range);
-    
+
     // TODO destructor
 
     //! Return the address for this endpoint.
     /*!
      * @returns The endpoint device address.
      */
-    const int address() throw();
+    const int address() const throw();
 
     //! Set up the I2C connection for further communication.
     /*!
@@ -115,7 +115,7 @@ public:
      * @returns Result from the I2C call.
      * @throws I2CEndpointException if access to the I2C device fails.
      */
-    int write(int data) throw(I2CEndpointException);
+    int write(const int data) throw(I2CEndpointException);
 
     //! Read 8 bits of data from a device register.
     /*!
@@ -123,14 +123,14 @@ public:
      * @returns Result from the I2C call.
      * @throws I2CEndpointException if access to the I2C device fails.
      */
-    int read_reg_8(int reg) throw(I2CEndpointException);
+    int read_reg_8(const int reg) throw(I2CEndpointException);
     //! Read 16 bits of data from a device register.
     /*!
      * @param reg The device register.
      * @returns Result from the I2C call.
      * @throws I2CEndpointException if access to the I2C device fails.
      */
-    int read_reg_16(int reg) throw(I2CEndpointException);
+    int read_reg_16(const int reg) throw(I2CEndpointException);
 
     //! Write 8 bits of data to a device register.
     /*!
@@ -139,7 +139,7 @@ public:
      * @returns Result from the I2C call.
      * @throws I2CEndpointException if access to the I2C device fails.
      */
-    int write_reg_8(int reg, int data) throw(I2CEndpointException);
+    int write_reg_8(const int reg, const int data) throw(I2CEndpointException);
     //! Write 16 bits of data to a device register.
     /*!
      * @param reg The device register.
@@ -147,10 +147,10 @@ public:
      * @returns Result from the I2C call.
      * @throws I2CEndpointException if access to the I2C device fails.
      */
-    int write_reg_16(int reg, int data) throw(I2CEndpointException);
+    int write_reg_16(const int reg, const int data) throw(I2CEndpointException);
 
 protected:
-    const int _fd() throw();
+    int _fd() const throw();
 
 private:
     const int m_address;
@@ -158,7 +158,8 @@ private:
 };
 
 
-}
+
+} // namespace xmppsc
 
 
 #endif // I2CENDPOINT_H__
