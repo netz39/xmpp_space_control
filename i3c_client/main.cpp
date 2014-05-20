@@ -12,7 +12,7 @@
 class TestMethod : public xmppsc::CommandMethod {
 public:
     TestMethod();
-    virtual ~TestMethod();
+    virtual ~TestMethod() throw();
 
     virtual void handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink);
 };
@@ -20,7 +20,7 @@ public:
 TestMethod::TestMethod(): CommandMethod("test") {
 }
 
-TestMethod::~TestMethod() {}
+TestMethod::~TestMethod() throw() {}
 
 void TestMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
     xmppsc::SpaceCommand response("Hallo Welt!",
@@ -58,9 +58,9 @@ int main(int argc, char **argv) {
     xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
     TestMethod* m = new TestMethod();
     i2ch->add_method(m);
-
-    i2ch->add_method(new xmppsc::I2CReadMethod());
-    i2ch->add_method(new xmppsc::I2CWriteMethod());
+    
+    i2ch->add_method(new xmppsc::I2CReadMethod(broker));
+    i2ch->add_method(new xmppsc::I2CWriteMethod(broker));
 
 
     if (client) {

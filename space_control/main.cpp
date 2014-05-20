@@ -29,8 +29,13 @@ using namespace xmppsc;
 
 class I2CHandler : public SpaceControlHandler {
 public:
+    virtual ~I2CHandler() throw();
+  
     virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
 };
+
+I2CHandler::~I2CHandler() throw() {}
+
 
 void I2CHandler::handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink) {
     cout << "Got command " << sc.cmd() << " from " << peer.full() << endl;

@@ -31,7 +31,7 @@ unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 {
     std::stringstream conv;
     conv << std::hex << hex;
-    
+
     int i;
 
     if (! (conv >> i)) {
@@ -65,10 +65,27 @@ template< typename T > const std::string int2hex(T i)
 
 namespace xmppsc {
 
-I2CReadMethod::I2CReadMethod(): CommandMethod("i2c.read") {}
+
+I2CMethodBase::I2CMethodBase(const std::string& command, I2CEndpointBroker* broker) throw(std::invalid_argument)
+    : CommandMethod(command), m_broker(broker)
+{
+    if (!m_broker)
+        throw std::invalid_argument("Broker ptr must not be null!");
+}
+
+I2CEndpointBroker* I2CMethodBase::broker() const throw()
+{
+  return m_broker;
+}
+
+I2CMethodBase::~I2CMethodBase() throw () {}
 
 
-I2CReadMethod::~I2CReadMethod() {}
+
+I2CReadMethod::I2CReadMethod(I2CEndpointBroker* broker): I2CMethodBase("i2c.read", broker) {}
+
+
+I2CReadMethod::~I2CReadMethod() throw () {}
 
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink *sink)
 {
@@ -83,9 +100,12 @@ void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc,
     const unsigned int address = hex2int(_address);
 
 
+    // get the device endpoint
+    I2CEndpoint* ep = broker()->endpoint(device);
+    
     // TODO perfom read
     std::cout << "Perform I2C read on address " << std::hex << address << " of device " << device << "." << std::endl;
-    const int result = 30;
+    const int result = ep->read_reg_16(address);
 
 
     xmppsc::SpaceCommand::space_command_params params;
@@ -97,9 +117,9 @@ void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc,
 }
 
 
-I2CWriteMethod::I2CWriteMethod(): CommandMethod("i2c.write") {}
+I2CWriteMethod::I2CWriteMethod(I2CEndpointBroker* broker): I2CMethodBase("i2c.write", broker) {}
 
-I2CWriteMethod::~I2CWriteMethod() {}
+I2CWriteMethod::~I2CWriteMethod() throw () {}
 
 void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink *sink)
 {

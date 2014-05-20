@@ -18,22 +18,37 @@
 #ifndef I2CMETHODS_H__
 #define I2CMETHODS_H__
 
+#include "i2cendpoint.h"
 #include "../space_control/spacecontrolclient.h"
 
 namespace xmppsc {
+  
+class I2CMethodBase : public CommandMethod {
+public:
+  I2CMethodBase(const std::string& command, I2CEndpointBroker* broker) 
+      throw(std::invalid_argument);
+      
+  virtual ~I2CMethodBase() throw();
+  
+protected:
+  I2CEndpointBroker* broker() const throw();
+  
+private:
+  I2CEndpointBroker* m_broker;
+};
 
-class I2CReadMethod : public CommandMethod {
+class I2CReadMethod : public I2CMethodBase {
   public:
-    I2CReadMethod();
-    ~I2CReadMethod();
+    I2CReadMethod(I2CEndpointBroker* broker);
+    virtual ~I2CReadMethod() throw();
     
     virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
 };
 
-class I2CWriteMethod : public CommandMethod {
+class I2CWriteMethod : public I2CMethodBase {
   public:
-    I2CWriteMethod();
-    ~I2CWriteMethod();
+    I2CWriteMethod(I2CEndpointBroker* broker);
+    virtual ~I2CWriteMethod() throw();
     
     virtual void handleSpaceCommand(gloox::JID peer, SpaceCommand sc, SpaceCommandSink* sink);
 };
