@@ -109,6 +109,38 @@ private:
     std::string m_what;
 };
 
+//! Exception for missing command parameters.
+class IllegalCommandParameterException : public std::exception {
+public:
+    //! Create a new exception
+    /*!
+     * \param _name        The name of the missing parameter.
+     */
+    IllegalCommandParameterException(const std::string& _name, const std::string& _reason);
+
+    //! Virtual destructor derrived from std::exception.
+    virtual ~IllegalCommandParameterException() throw();
+
+    //! Get the exception message.
+    /*!
+     * \returns the exception message
+     */
+    virtual const char* what() const throw();
+
+    virtual const char* name() const throw();
+
+    virtual const char* reason() const throw();
+private:
+    std::string m_name;
+    std::string m_reason;
+    /* 
+     * The message for what() is functional dependent on m_name, 
+     * but must be stored here due to scope issues. Assembly is
+     * done in the constructor.
+     */
+    std::string m_what;
+};
+
 
 //! Space Command representation.
 /*!

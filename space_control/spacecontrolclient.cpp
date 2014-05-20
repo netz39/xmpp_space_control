@@ -68,6 +68,34 @@ const char* MissingCommandParameterException::name() const throw()
 }
 
 
+IllegalCommandParameterException::IllegalCommandParameterException(
+    const std::string& _name, const std::string& _reason)
+    : m_name(_name), m_reason(_reason)
+{
+    std::stringstream msg;
+    msg << "Illegal parameter (" << m_name << "): " << _reason;
+    m_what = msg.str();
+
+}
+
+IllegalCommandParameterException::~IllegalCommandParameterException() throw() {}
+
+const char* IllegalCommandParameterException::what() const throw()
+{
+    return m_what.c_str();
+}
+
+const char* IllegalCommandParameterException::name() const throw()
+{
+    return m_name.c_str();
+}
+
+const char* IllegalCommandParameterException::reason() const throw()
+{
+    return m_reason.c_str();
+}
+
+
 SpaceCommand::SpaceCommand(const std::string _cmd,
                            std::map<const std::string, std::string> _params)
     : m_cmd(_cmd), m_params(_params) {}
