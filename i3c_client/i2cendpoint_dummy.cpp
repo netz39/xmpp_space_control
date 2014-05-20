@@ -55,6 +55,9 @@ I2CEndpoint::I2CEndpoint(const int address) throw (std::out_of_range)
     }
 }
 
+I2CEndpoint::I2CEndpoint(const I2CEndpoint& other)
+    : m_address(other.m_address), m_fd(other.m_fd) { }
+
 const int I2CEndpoint::address() const throw()
 {
     return m_address;

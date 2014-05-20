@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <map>
 
 namespace xmppsc {
 
@@ -74,7 +75,9 @@ public:
      */
     // TODO check parameter type, 8 bits are sufficient
     I2CEndpoint(const int address) throw (std::out_of_range);
-
+    
+    I2CEndpoint(const I2CEndpoint& other);
+    
     // TODO destructor
 
     //! Return the address for this endpoint.
@@ -157,6 +160,20 @@ private:
     int m_fd;
 };
 
+
+class I2CEndpointBroker {
+public:
+    I2CEndpointBroker();
+    ~I2CEndpointBroker() throw(I2CEndpointException);
+
+    //! Create (if necessary) and return an I2C endpoint for the specified address.
+    I2CEndpoint& endpoint(const int address) throw(I2CEndpointException, std::out_of_range);
+
+    void free_all_endpoints() throw(I2CEndpointException);
+private:
+    typedef std::map<int, I2CEndpoint> endpoint_map;
+    endpoint_map endpoints;
+};
 
 
 } // namespace xmppsc
