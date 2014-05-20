@@ -140,16 +140,20 @@ protected:
 
 private:
     // No Copies of this instance!
+    // (Not implemented and never to be called.)
     I2CEndpoint(const I2CEndpoint& other);
 
     const int m_address;
     int m_fd;
 };
 
-
+//! Store and manage a cache of already established I2C endpoints
 class I2CEndpointBroker {
 public:
+    //! Create an I2C broker instance.
     I2CEndpointBroker();
+
+    //! Clean-up the instance and clean-up/remove all existing I2C endpoints.
     ~I2CEndpointBroker() throw();
 
     //! Create (if necessary) and return an I2C endpoint for the specified address.

@@ -18,7 +18,6 @@
  * endpoint part.
  */
 
-//TODO comments
 
 #include "i2cendpoint.h"
 
@@ -31,8 +30,7 @@
 
 #include <wiringPiI2C.h>
 
-using namespace xmppsc;
-
+namespace xmppsc {
 
 I2CEndpoint::I2CEndpoint(const int address) throw (I2CEndpointException, std::out_of_range)
     : m_address(address), m_fd(0)
@@ -119,3 +117,7 @@ int I2CEndpoint::write_reg_16(const int reg, const int data) throw(I2CEndpointEx
     I2C_EXC("Error on I2C 16-bit write!");
     return res;
 }
+
+} // namespace xmppsc
+
+// End of File

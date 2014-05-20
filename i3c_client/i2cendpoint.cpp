@@ -63,10 +63,11 @@ I2CEndpoint* I2CEndpointBroker::endpoint(const int address) throw(I2CEndpointExc
         // none found, create and setup
         I2CEndpoint* ep = new I2CEndpoint(address);
 
-        // store and return
+        // store
         std::pair<endpoint_map::iterator, bool> res =
             endpoints.insert(endpoint_map::value_type(address, ep));
 
+        // throw an exception if the endpoint could not be stored to the map
         if (!res.second) {
             delete ep;
             throw I2CEndpointException(address, 0, "Could not store endpoint to broker!");

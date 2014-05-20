@@ -17,15 +17,12 @@
  * This is the dummy implementation of the plattform-specific I2C endpoint part.
  */
 
-//TODO comments
 
 #include "i2cendpoint.h"
 
 #include <iostream>
 #include <string>
 #include <sstream>
-
-using namespace xmppsc;
 
 namespace {
 
@@ -44,6 +41,8 @@ int __dummy_input(const std::string msg) {
 
 } // anon namespace
 
+
+namespace xmppsc {
 
 I2CEndpoint::I2CEndpoint(const int address) throw (I2CEndpointException, std::out_of_range)
     : m_address(address), m_fd(0)
@@ -129,3 +128,7 @@ int I2CEndpoint::write_reg_16(const int reg, const int data) throw(I2CEndpointEx
         << " on register 0x" << reg << ", written value 0x" << data << ": ";
     return ::__dummy_input(msg.str());
 }
+
+} // namespace xmppsc
+
+// End of File
