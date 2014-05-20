@@ -29,19 +29,19 @@ namespace
 
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 {
-    try {
-	std::stringstream conv(hex);
-	conv.exceptions(std::stringstream::failbit | std::stringstream::badbit);
+    std::istringstream conv(hex);
+    conv.exceptions(std::istringstream::failbit | std::istringstream::badbit);
 
-	int i;
-        conv >> std::hex >> i;
-	return i;
-    } catch(std::stringstream::failure e) {
-        std::stringstream msg("");
-        msg << "Exception on hex value conversion (value " << hex << "): ";
-        msg << e.what();
+    int i;
+    conv >> std::hex >> i;
+
+    if (!conv.good()) {
+        std::ostringstream msg("");
+        msg << "Error on hex value conversion (value " << hex << ")!";
         throw std::invalid_argument(msg.str());
     }
+
+    return i;
 }
 
 // http://stackoverflow.com/a/5100745
@@ -136,5 +136,7 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc
 } // namespace xmppsc
 
 // End of file
+
+
 
 
