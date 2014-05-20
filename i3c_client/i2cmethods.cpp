@@ -66,6 +66,8 @@ I2CReadMethod::I2CReadMethod(): CommandMethod("i2c.read") {}
 I2CReadMethod::~I2CReadMethod() {}
 
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
+    //TODO check the parameter conversions and add exceptions accordingly
+  
     // get the device
     const std::string _device = sc.param("device");
     const unsigned int device = hex2int(_device);
@@ -94,6 +96,8 @@ I2CWriteMethod::I2CWriteMethod(): CommandMethod("i2c.write") {}
 I2CWriteMethod::~I2CWriteMethod() {}
 
 void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
+    //TODO check the parameter conversions and add exceptions accordingly
+
     // get the device
     const std::string _device = sc.param("device");
     const unsigned int device = hex2int(_device);
