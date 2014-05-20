@@ -146,8 +146,9 @@ private:
 /*!
  * This class represents a Space Command, consisting of the issuing/receiving
  * peer, the command name and the parameter map.
+ * 
+ * This class is immutable.
  */
-//TODO copy constructor
 class SpaceCommand {
 public:
     //! Convenience typedef for the parameter map.
@@ -158,28 +159,37 @@ public:
      * \param _cmd    The command name
      * \param _params The parameter map.
      */
-    SpaceCommand(const std::string _cmd, space_command_params _params);
+    SpaceCommand(const std::string& _cmd, const space_command_params& _params) throw();
+    
+    //! Copy constructor.
+    SpaceCommand(const SpaceCommand& other);
 
     //! Get the command name.
     /*!
      * \returns The command name
      */
-    std::string cmd();
+    const std::string& cmd() const throw();
 
     //! Get a parameter value
     /*!
      * \param key The parameter name.
      * \returns The value for the provided key.
-     * \throws std::out_of_range if the parameter does not exist.
+     * \throws MissingCommandParameterException if the parameter does not exist.
      */
-    const std::string param(const std::string key)
+    const std::string& param(const std::string& key) const
       throw(MissingCommandParameterException);
+      
+    bool param_available(const std::string& key) const;
 
-    space_command_params params();
+    //! Direct access to the parameter map.
+    /*!
+     * Stick to the provided member functions if possible!
+     */
+    const space_command_params& params() const throw();
 
 private:
-    std::string m_cmd;
-    space_command_params m_params;
+    const std::string m_cmd;
+    const space_command_params m_params;
 };
 
 //! Interface to a Space Command serializer
@@ -354,3 +364,5 @@ private:
 }
 
 #endif // SPACECONTROLCLIENT_H__
+
+

@@ -96,25 +96,28 @@ const char* IllegalCommandParameterException::reason() const throw()
 }
 
 
-SpaceCommand::SpaceCommand(const std::string _cmd,
-                           std::map<const std::string, std::string> _params)
+SpaceCommand::SpaceCommand(const std::string& _cmd,
+                           const space_command_params& _params) throw()
     : m_cmd(_cmd), m_params(_params) {}
+    
+SpaceCommand::SpaceCommand(const SpaceCommand& other)    
+    : m_cmd(other.m_cmd), m_params(other.m_params) {}
 
-std::string SpaceCommand::cmd() {
+const std::string& SpaceCommand::cmd() const throw() {
     return this->m_cmd;
 }
 
-const std::string SpaceCommand::param(const std::string key)
+const std::string& SpaceCommand::param(const std::string& key) const
 throw(MissingCommandParameterException) {
-    try {
-        const std::string _value = m_params.at(key);
-        return _value;
-    } catch (std::out_of_range &oor) {
+    space_command_params::const_iterator it = m_params.find(key);
+    
+    if (it == m_params.end()) 
         throw MissingCommandParameterException(key);
-    }
+
+    return it->second;
 }
 
-SpaceCommand::space_command_params SpaceCommand::params() {
+const SpaceCommand::space_command_params& SpaceCommand::params() const throw() {
     return m_params;
 }
 
@@ -341,4 +344,6 @@ SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
     // return sink that is not shared
     return new Sink(session, m_ser, false);
 }
+
+
 

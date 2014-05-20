@@ -104,6 +104,7 @@ I2CReadMethod::~I2CReadMethod() throw () {}
 
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink *sink)
 {
+  
     // get parameters
     const unsigned int device = retrieveHexParameter("device", sc);
     const unsigned int reg = retrieveHexParameter("register", sc);
