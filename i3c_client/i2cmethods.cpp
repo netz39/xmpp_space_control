@@ -26,7 +26,79 @@
 
 using namespace xmppsc;
 
-const unsigned int hex2int(const std::string hex) throw (std::invalid_argument) {
+// local helper functions
+namespace xmppsc {
+  const unsigned int hex2int(const std::string hex) throw (std::invalid_argument);
+  template< typename T > const std::string int2hex( T i );
+} // namespace xmppsc
+  
+
+I2CReadMethod::I2CReadMethod(): CommandMethod("i2c.read") {}
+
+I2CReadMethod::~I2CReadMethod() {}
+
+void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
+    //TODO check the parameter conversions and add exceptions accordingly
+  
+    // get the device
+    const std::string _device = sc.param("device");
+    const unsigned int device = xmppsc::hex2int(_device);
+
+    // get the address
+    const std::string _address = sc.param("address");
+    const unsigned int address = xmppsc::hex2int(_address);
+
+
+    // TODO perfom read
+    std::cout << "Perform I2C read on address " << std::hex << address << " of device " << device << "." << std::endl;
+    const int result = 30;
+
+
+    xmppsc::SpaceCommand::space_command_params params;
+    params["device"] = xmppsc::int2hex(device);
+    params["address"] = xmppsc::int2hex(address);
+    params["response"] = xmppsc::int2hex(result);
+    xmppsc::SpaceCommand idcmd("i2c.update", params);
+    sink->sendSpaceCommand(&idcmd);
+}
+
+
+I2CWriteMethod::I2CWriteMethod(): CommandMethod("i2c.write") {}
+
+I2CWriteMethod::~I2CWriteMethod() {}
+
+void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
+    //TODO check the parameter conversions and add exceptions accordingly
+
+    // get the device
+    const std::string _device = sc.param("device");
+    const unsigned int device = xmppsc::hex2int(_device);
+
+    // get the address
+    const std::string _address = sc.param("address");
+    const unsigned int address = xmppsc::hex2int(_address);
+
+    // get the value
+    const std::string _value = sc.param("value");
+    const unsigned int value = xmppsc::hex2int(_value);
+
+
+    // TODO perfom write
+    std::cout << "Perform I2C write of value " << std::hex << value << " on address " << address << " of device " << device << "." << std::endl;
+
+    const int result = 0;
+
+    xmppsc::SpaceCommand::space_command_params params;
+    params["device"] = xmppsc::int2hex(device);
+    params["address"] = xmppsc::int2hex(address);
+    params["value"] = xmppsc::int2hex(value);
+    params["response"] = xmppsc::int2hex(result);
+    xmppsc::SpaceCommand idcmd("i2c.update", params);
+    sink->sendSpaceCommand(&idcmd);
+}
+
+
+const unsigned int xmppsc::hex2int(const std::string hex) throw (std::invalid_argument) {
     int i;
 
     std::stringstream conv(hex);
@@ -45,7 +117,7 @@ const unsigned int hex2int(const std::string hex) throw (std::invalid_argument) 
 }
 
 // http://stackoverflow.com/a/5100745
-template< typename T > const std::string int2hex( T i ) {
+template< typename T > const std::string xmppsc::int2hex( T i ) {
     // get the size
     register int c = 2;
     T _i = i;
@@ -61,69 +133,6 @@ template< typename T > const std::string int2hex( T i ) {
     return stream.str();
 }
 
-I2CReadMethod::I2CReadMethod(): CommandMethod("i2c.read") {}
-
-I2CReadMethod::~I2CReadMethod() {}
-
-void I2CReadMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
-    //TODO check the parameter conversions and add exceptions accordingly
-  
-    // get the device
-    const std::string _device = sc.param("device");
-    const unsigned int device = hex2int(_device);
-
-    // get the address
-    const std::string _address = sc.param("address");
-    const unsigned int address = hex2int(_address);
-
-
-    // TODO perfom read
-    std::cout << "Perform I2C read on address " << std::hex << address << " of device " << device << "." << std::endl;
-    const int result = 30;
-
-
-    xmppsc::SpaceCommand::space_command_params params;
-    params["device"] = int2hex(device);
-    params["address"] = int2hex(address);
-    params["response"] = int2hex(result);
-    xmppsc::SpaceCommand idcmd("i2c.update", params);
-    sink->sendSpaceCommand(&idcmd);
-}
-
-
-I2CWriteMethod::I2CWriteMethod(): CommandMethod("i2c.write") {}
-
-I2CWriteMethod::~I2CWriteMethod() {}
-
-void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, xmppsc::SpaceCommand sc, xmppsc::SpaceCommandSink* sink) {
-    //TODO check the parameter conversions and add exceptions accordingly
-
-    // get the device
-    const std::string _device = sc.param("device");
-    const unsigned int device = hex2int(_device);
-
-    // get the address
-    const std::string _address = sc.param("address");
-    const unsigned int address = hex2int(_address);
-
-    // get the value
-    const std::string _value = sc.param("value");
-    const unsigned int value = hex2int(_value);
-
-
-    // TODO perfom write
-    std::cout << "Perform I2C write of value " << std::hex << value << " on address " << address << " of device " << device << "." << std::endl;
-
-    const int result = 0;
-
-    xmppsc::SpaceCommand::space_command_params params;
-    params["device"] = int2hex(device);
-    params["address"] = int2hex(address);
-    params["value"] = int2hex(value);
-    params["response"] = int2hex(result);
-    xmppsc::SpaceCommand idcmd("i2c.update", params);
-    sink->sendSpaceCommand(&idcmd);
-}
 
 
 // End of file
