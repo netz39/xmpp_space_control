@@ -9,36 +9,6 @@
 #include "i2cendpoint.h"
 
 
-class TestMethod : public xmppsc::CommandMethod {
-public:
-    TestMethod();
-    virtual ~TestMethod() throw();
-
-    virtual void handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink);
-};
-
-TestMethod::TestMethod(): CommandMethod("test") {
-}
-
-TestMethod::~TestMethod() throw() {}
-
-void TestMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-    xmppsc::SpaceCommand response("Hallo Welt!",
-                                  xmppsc::SpaceCommand::space_command_params());
-
-    sink->sendSpaceCommand(response);
-
-    try {
-        xmppsc::SpaceCommand::space_command_params params;
-        params["id"] = sc.param("id");
-        xmppsc::SpaceCommand idcmd("id", params);
-        sink->sendSpaceCommand(idcmd);
-    } catch (std::out_of_range &oor) {
-        std::cerr << "Parameter id is not available!" << std::endl;
-    }
-}
-
-
 int main(int argc, char **argv) {
     xmppsc::I2CEndpointBroker*  broker = new xmppsc::I2CEndpointBroker();
 
@@ -56,8 +26,6 @@ int main(int argc, char **argv) {
     }
 
     xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
-    TestMethod* m = new TestMethod();
-    i2ch->add_method(m);
     
     i2ch->add_method(new xmppsc::I2CReadMethod(broker));
     i2ch->add_method(new xmppsc::I2CRead8Method(broker));
