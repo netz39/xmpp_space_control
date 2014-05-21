@@ -24,7 +24,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace 
+namespace
 {
 
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
@@ -99,12 +99,35 @@ I2CMethodBase::~I2CMethodBase() throw () {}
 
 I2CReadMethod::I2CReadMethod(I2CEndpointBroker* broker): I2CMethodBase("i2c.read", broker) {}
 
-
 I2CReadMethod::~I2CReadMethod() throw () {}
 
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
 {
+    // get parameters
+    const unsigned int device = retrieveHexParameter("device", sc);
 
+    // get the device endpoint
+    I2CEndpoint* ep = broker()->endpoint(device);
+
+    // perfom read
+    std::cout << "Perform I2C read on device " << device << "." << std::endl;
+    const int result = ep->read();
+
+    // send result
+    xmppsc::SpaceCommand::space_command_params params;
+    params["device"] = int2hex(device);
+    params["response"] = int2hex(result);
+    const xmppsc::SpaceCommand idcmd("i2c.update", params);
+    sink->sendSpaceCommand(idcmd);
+}
+
+
+I2CRead8Method::I2CRead8Method(I2CEndpointBroker* broker): I2CMethodBase("i2c.read8", broker) {}
+
+I2CRead8Method::~I2CRead8Method() throw () {}
+
+void I2CRead8Method::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
+{
     // get parameters
     const unsigned int device = retrieveHexParameter("device", sc);
     const unsigned int reg = retrieveHexParameter("register", sc);
@@ -114,15 +137,43 @@ void I2CReadMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceComma
     I2CEndpoint* ep = broker()->endpoint(device);
 
     // perfom read
-    std::cout << "Perform I2C read on register " << std::hex << reg << " of device " << device << "." << std::endl;
-    const int result = ep->read_reg_16(reg);
+    std::cout << "Perform I2C read on 8-bit register " << std::hex << reg << " of device " << device << "." << std::endl;
+    const int result = ep->read_reg_8(reg);
 
-
+    // send result
     xmppsc::SpaceCommand::space_command_params params;
     params["device"] = int2hex(device);
     params["register"] = int2hex(reg);
     params["response"] = int2hex(result);
-    xmppsc::SpaceCommand idcmd("i2c.update", params);
+    const xmppsc::SpaceCommand idcmd("i2c.update", params);
+    sink->sendSpaceCommand(idcmd);
+}
+
+
+I2CRead16Method::I2CRead16Method(I2CEndpointBroker* broker): I2CMethodBase("i2c.read16", broker) {}
+
+I2CRead16Method::~I2CRead16Method() throw () {}
+
+void I2CRead16Method::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
+{
+    // get parameters
+    const unsigned int device = retrieveHexParameter("device", sc);
+    const unsigned int reg = retrieveHexParameter("register", sc);
+
+
+    // get the device endpoint
+    I2CEndpoint* ep = broker()->endpoint(device);
+
+    // perfom read
+    std::cout << "Perform I2C read on 16-bit register " << std::hex << reg << " of device " << device << "." << std::endl;
+    const int result = ep->read_reg_16(reg);
+
+    // send result
+    xmppsc::SpaceCommand::space_command_params params;
+    params["device"] = int2hex(device);
+    params["register"] = int2hex(reg);
+    params["response"] = int2hex(result);
+    const xmppsc::SpaceCommand idcmd("i2c.update", params);
     sink->sendSpaceCommand(idcmd);
 }
 
@@ -135,6 +186,33 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceComm
 {
     // get parameters
     const unsigned int device = retrieveHexParameter("device", sc);
+    const unsigned int data = retrieveHexParameter("data", sc);
+
+
+    // get the device endpoint
+    I2CEndpoint* ep = broker()->endpoint(device);
+
+    // perfom write
+    std::cout << "Perform I2C write of value " << std::hex << data << " to device " << device << "." << std::endl;
+    const int result = ep->write(data);
+
+    xmppsc::SpaceCommand::space_command_params params;
+    params["device"] = int2hex(device);
+    params["value"] = int2hex(data);
+    params["response"] = int2hex(result);
+    const xmppsc::SpaceCommand idcmd("i2c.update", params);
+    sink->sendSpaceCommand(idcmd);
+}
+
+
+I2CWrite8Method::I2CWrite8Method(I2CEndpointBroker* broker): I2CMethodBase("i2c.write8", broker) {}
+
+I2CWrite8Method::~I2CWrite8Method() throw () {}
+
+void I2CWrite8Method::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
+{
+    // get parameters
+    const unsigned int device = retrieveHexParameter("device", sc);
     const unsigned int reg = retrieveHexParameter("register", sc);
     const unsigned int data = retrieveHexParameter("data", sc);
 
@@ -143,15 +221,44 @@ void I2CWriteMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceComm
     I2CEndpoint* ep = broker()->endpoint(device);
 
     // perfom write
-    std::cout << "Perform I2C write of value " << std::hex << data << " on register " << reg << " of device " << device << "." << std::endl;
+    std::cout << "Perform I2C 8-bit write of value " << std::hex << data << " to register " << reg << " of device " << device << "." << std::endl;
+    const int result = ep->write_reg_8(reg, data);
+
+    xmppsc::SpaceCommand::space_command_params params;
+    params["device"] = int2hex(device);
+    params["register"] = int2hex(reg);
+    params["value"] = int2hex(data);
+    params["response"] = int2hex(result);
+    const xmppsc::SpaceCommand idcmd("i2c.update", params);
+    sink->sendSpaceCommand(idcmd);
+}
+
+
+I2CWrite16Method::I2CWrite16Method(I2CEndpointBroker* broker): I2CMethodBase("i2c.write16", broker) {}
+
+I2CWrite16Method::~I2CWrite16Method() throw () {}
+
+void I2CWrite16Method::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
+{
+    // get parameters
+    const unsigned int device = retrieveHexParameter("device", sc);
+    const unsigned int reg = retrieveHexParameter("register", sc);
+    const unsigned int data = retrieveHexParameter("data", sc);
+
+
+    // get the device endpoint
+    I2CEndpoint* ep = broker()->endpoint(device);
+
+    // perfom write
+    std::cout << "Perform I2C 16-bit write of value " << std::hex << data << " to register " << reg << " of device " << device << "." << std::endl;
     const int result = ep->write_reg_16(reg, data);
 
     xmppsc::SpaceCommand::space_command_params params;
-    params["device"] = ::int2hex(device);
-    params["register"] = ::int2hex(reg);
-    params["value"] = ::int2hex(data);
-    params["response"] = ::int2hex(result);
-    xmppsc::SpaceCommand idcmd("i2c.update", params);
+    params["device"] = int2hex(device);
+    params["register"] = int2hex(reg);
+    params["value"] = int2hex(data);
+    params["response"] = int2hex(result);
+    const xmppsc::SpaceCommand idcmd("i2c.update", params);
     sink->sendSpaceCommand(idcmd);
 }
 

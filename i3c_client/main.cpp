@@ -60,7 +60,11 @@ int main(int argc, char **argv) {
     i2ch->add_method(m);
     
     i2ch->add_method(new xmppsc::I2CReadMethod(broker));
+    i2ch->add_method(new xmppsc::I2CRead8Method(broker));
+    i2ch->add_method(new xmppsc::I2CRead16Method(broker));
     i2ch->add_method(new xmppsc::I2CWriteMethod(broker));
+    i2ch->add_method(new xmppsc::I2CWrite8Method(broker));
+    i2ch->add_method(new xmppsc::I2CWrite16Method(broker));
 
 
     if (client) {

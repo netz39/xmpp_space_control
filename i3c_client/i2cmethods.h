@@ -45,6 +45,23 @@ class I2CReadMethod : public I2CMethodBase {
     virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
 };
 
+class I2CRead8Method : public I2CMethodBase {
+  public:
+    I2CRead8Method(I2CEndpointBroker* broker);
+    virtual ~I2CRead8Method() throw();
+    
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
+};
+
+class I2CRead16Method : public I2CMethodBase {
+  public:
+    I2CRead16Method(I2CEndpointBroker* broker);
+    virtual ~I2CRead16Method() throw();
+    
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
+};
+
+
 class I2CWriteMethod : public I2CMethodBase {
   public:
     I2CWriteMethod(I2CEndpointBroker* broker);
@@ -52,5 +69,24 @@ class I2CWriteMethod : public I2CMethodBase {
     
     virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
 };
-}
+
+
+class I2CWrite8Method : public I2CMethodBase {
+  public:
+    I2CWrite8Method(I2CEndpointBroker* broker);
+    virtual ~I2CWrite8Method() throw();
+    
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
+};
+
+
+class I2CWrite16Method : public I2CMethodBase {
+  public:
+    I2CWrite16Method(I2CEndpointBroker* broker);
+    virtual ~I2CWrite16Method() throw();
+    
+    virtual void handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink);
+};
+
+} // namespace xmppsc
 #endif // I2CMETHODS_H__
