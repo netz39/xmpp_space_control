@@ -24,7 +24,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace
+namespace 
 {
 
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
@@ -69,9 +69,9 @@ throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameter
     } catch (std::invalid_argument& ia) {
         throw xmppsc::IllegalCommandParameterException(parameter, ia.what());
     } catch (xmppsc::MissingCommandParameterException& e) {
-      if (required)
-	throw e;
-      return def;
+        if (required)
+            throw e;
+        return def;
     }
 }
 
@@ -104,7 +104,7 @@ I2CReadMethod::~I2CReadMethod() throw () {}
 
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
 {
-  
+
     // get parameters
     const unsigned int device = retrieveHexParameter("device", sc);
     const unsigned int reg = retrieveHexParameter("register", sc);

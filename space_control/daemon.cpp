@@ -17,9 +17,9 @@
 #include <syslog.h>
 
 
-using namespace xmppsc;
+namespace {
 
-static bool hup_received = false;
+bool hup_received = false;
 
 // Signal handler for SIGHUP
 void sig_handler(int signo)
@@ -37,6 +37,11 @@ void sig_handler(int signo)
         syslog(LOG_ERR, "Unknown signal: %d", signo);
     }
 }
+
+} // anon namespace
+
+
+namespace xmppsc {
 
 extern "C" int read_pid()
 {
@@ -58,6 +63,7 @@ extern "C" int send_sighup(const int pid)
 {
     return kill(pid, SIGHUP);
 }
+
 
 Daemon::Daemon(const char *_name)
     : m_name(_name), m_lock(0)
@@ -150,3 +156,6 @@ bool Daemon::sighup()
     return hup_received;
 }
 
+} // namespace xmppsc
+
+// End of File

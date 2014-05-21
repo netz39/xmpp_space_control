@@ -3,16 +3,14 @@
 
 #include <syslog.h>
 
-namespace xmppsc
-{
+namespace xmppsc {
 //TODO configure somewhere else
 #define PID_FILE    "/var/run/spacecontrol/pid"
 
 extern "C" int read_pid();
 extern "C" int send_sighup(const int pid);
 
-class Daemon
-{
+class Daemon {
 public:
     Daemon(const char *_name);
     ~Daemon();
@@ -40,7 +38,7 @@ private:
 };
 
 
-} // namespace wd
+} // namespace xmppsc
 
 
 #endif // __DAEMON_H__

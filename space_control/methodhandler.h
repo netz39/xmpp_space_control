@@ -22,7 +22,6 @@
 #include <map>
 
 namespace xmppsc {
-
   
   
 //! Method handler; Handler for a specific command name set.
@@ -47,7 +46,6 @@ public:
 private:
     std::map<std::string, CommandMethod*> m_methods;
 };
-
 
 
 }

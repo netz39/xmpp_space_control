@@ -24,7 +24,7 @@
 #include <cstdlib>
 
 
-using namespace xmppsc;
+namespace xmppsc {
 
 SpaceCommandFormatException::SpaceCommandFormatException(std::string _what,
         std::string _body, int _line_number=0)
@@ -345,5 +345,9 @@ SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
     return new Sink(session, m_ser, false);
 }
 
+
+} // namespace xmppsc
+
+// End of File
 
 

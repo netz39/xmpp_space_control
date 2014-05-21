@@ -21,7 +21,7 @@
 #include <iostream>
 #include <sstream>
 
-using namespace xmppsc;
+namespace xmppsc {
 
 
 MethodHandler::~MethodHandler() {}
@@ -75,6 +75,6 @@ void MethodHandler::add_method(CommandMethod* method) {
 
 
 
-
+} // namespace xmppsc
 
 // End of file
