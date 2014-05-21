@@ -88,6 +88,7 @@ AccessFilter* ConfiguredClientFactory::newAccessFilter() throw(ConfiguredClientF
 	
         for (int i = 0; i < s_access.getLength(); i++)
            jidlist.push_back(gloox::JID(s_access[i]));
+	
 
         af = new ListAccessFilter(jidlist);
     } catch (const libconfig::SettingNotFoundException& snfex) {
