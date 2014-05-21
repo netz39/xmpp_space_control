@@ -18,6 +18,8 @@
 #ifndef ACCESSFILTER_H__
 #define ACCESSFILTER_H__
 
+#include <set>
+
 #include <gloox/jid.h>
 
 
@@ -29,7 +31,7 @@ namespace xmppsc {
  */
 class AccessFilter {
 public:
-    AccessFilter();
+    AccessFilter() throw();
 
     virtual ~AccessFilter() throw();
 
@@ -38,10 +40,25 @@ public:
      * @param jid the JID to be checked
      * @returns true if the JID can be accepted, otherwise false
      */
-    virtual bool accepted(const gloox::JID& jid) throw() = 0;
+    virtual bool accepted(const gloox::JID& jid) const throw() = 0;
 };
 
 
+class ListAccessFilter : public AccessFilter {
+public:
+    // TODO compare method
+    typedef std::set<gloox::JID> jid_list;
+
+    ListAccessFilter(const jid_list& jids) throw();
+    
+    virtual ~ListAccessFilter() throw();
+
+    const jid_list& jids() const throw();
+    
+    virtual bool accepted(const gloox::JID& jid) const throw() = 0;
+private:
+  const jid_list m_jids;
+};
 
 } // namespace xmppsc
 

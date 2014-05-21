@@ -18,9 +18,29 @@
 
 
 namespace xmppsc {
-  
-  
-  
+
+AccessFilter::AccessFilter() throw() {}
+
+AccessFilter::~AccessFilter() throw() {}
+
+
+
+ListAccessFilter::ListAccessFilter(const ListAccessFilter::jid_list& jids) throw()
+    : m_jids(jids) { }
+
+ListAccessFilter::~ListAccessFilter() throw() { }
+
+const ListAccessFilter::jid_list& ListAccessFilter::jids() const throw()
+{
+    return m_jids;
+}
+
+bool ListAccessFilter::accepted(const gloox::JID& jid) const throw()
+{
+  return m_jids.find(jid) != m_jids.end();
+}
+
+
 } // namespace xmppsc
 
 // End of File
