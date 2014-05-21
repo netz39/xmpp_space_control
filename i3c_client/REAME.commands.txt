@@ -1,0 +1,55 @@
+I2C SpaceControl Commands
+=========================
+
+
+Jedes der Kommandos verarbeitet ein (sub)set der folgenden Parameter:
+
+device		I2C-Adresse des Zieldevices
+register	I2C-Registernummer
+data		Datenwert
+
+Rückgabewerte werden in "response" gespeichert. Dabei wird auch das komplette Query-Parameterset mitgeliefert, sodass aus der Antwortnachricht die komplette Anfrage rekonstruiert werden kann.
+
+
+Im Folgenden sind die verfügbaren Commands mit Parametern angegeben, wobei alle angegebenen Parameter REQUIRED sind.
+
+
+Command: 	i2c.read
+Parameter: 	device
+Beschreibung: 	Einfache I2C-Leseoperation auf dem Device.
+
+Command 	i2c.read8
+Parameter: 	device, register
+Beschreibung: 	8-bit-Wert von Register lesen
+
+Command 	i2c.read16
+Parameter: 	device, register
+Beschreibung: 	16-bit-Wert von Register lesen
+
+Command: 	i2c.write
+Parameter: 	device, data
+Beschreibung: 	Einfache I2C-Schreiboperation auf das Device.
+
+Command: 	i2c.write8
+Parameter: 	device, register, data
+Beschreibung: 	8-bit-Wert data in register des device schreiben.
+
+Command: 	i2c.write16
+Parameter: 	device, register, data
+Beschreibung: 	16-bit-Wert data in register des device schreiben.
+
+
+Die Commands ergeben sich aus den Funktionen der wiringPi-Bibliothek.
+
+
+Folgende Rückgaben sind möglich:
+
+Command: 	i2c.update
+Parameter: 	device, <register>, <data>, response
+Beschreibung: 	Rückgabe eines Operationsergebnisses
+
+Command: 	i2c.exception
+Parameter:	what 	Exception-Message
+		device	I2C-Zieldevice der Anfrage
+		error	I2C-Fehlermeldung
+Beschreibung: 	Eine I2C-Exception ist aufgetreten, die Anfrage war nicht erfolgreich.
