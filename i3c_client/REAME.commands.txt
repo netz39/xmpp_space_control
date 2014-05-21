@@ -1,7 +1,6 @@
 I2C SpaceControl Commands
 =========================
 
-
 Jedes der Kommandos verarbeitet ein (sub)set der folgenden Parameter:
 
 device		I2C-Adresse des Zieldevices
@@ -53,3 +52,35 @@ Parameter:	what 	Exception-Message
 		device	I2C-Zieldevice der Anfrage
 		error	I2C-Fehlermeldung
 Beschreibung: 	Eine I2C-Exception ist aufgetreten, die Anfrage war nicht erfolgreich.
+
+
+I3C Commands
+============
+
+I3C (Interruptible Inter-Integrated Circuit) erweitert I2C um eine Interrupt-Leitung und ein Kommmandoformat für einfache Device-Kommunikation.
+
+Anfragen werden grundsätzlich über i2c.read16 gestellt. Dabei wird die eigentliche Anfrage in der Registeradresse kodiert.
+
+Das Register ist wie folgt belegt:
+
+    +---+-----+------+
+    | P | CCC | DDDD |
+    +---+-----+------+
+    
+    P ... Parity
+    C ... Command
+    D ... Data
+
+Aufrufe haben also immer die Form Command(Data), Parity ist die Anzahl der gesetzten Bits mod 2 (ohne Parity selbst). Die Belegung der Commands hängt vom jeweiligen Device ab.
+
+Die 16 Bit Rückgabe bestehen aus einer 8-Bit-Antwort und der invertierten Antwort. Gibt es dort Diskrepanzen, muss das Ergebnis als ungültig betrachtet werden (kann aber trotzdem Seiteneffekte ausgelöst haben)!
+
+Ein Rückgabewert von 0 bedeutet, dass das Register fehlerhaft war (fehlerhafte Parität) und die Anfrage verworfen wurde. Alle anderen Werte sind von der Anwendung spezifiziert.
+
+[Die Prüfsummenverfahren können überarbeitet werden …]
+
+Wenn ein Statuswechsel eintritt, für den eine Anfrage andere Rückgabewerte liefert, wird die Interrupt-Leitung aktiviert. Wurde die entsprechende Anfrage durchgeführt, wird der Interrupt zurückgesetzt.
+
+[Auch hier ist der Prozess verbesserungswürdig.]
+
+
