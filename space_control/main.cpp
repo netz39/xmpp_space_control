@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 
     if (client) {      
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, new I2CHandler(), 
-									 new TextSpaceCommandSerializer());
+									 new TextSpaceCommandSerializer(), NULL);
 
         if (!client->connect(true))
             cerr << "could not connect!" << endl;

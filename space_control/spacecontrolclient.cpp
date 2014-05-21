@@ -276,8 +276,12 @@ CommandMethod::t_command_set& CommandMethod::command_set() {
 }
 
 
-SpaceControlClient::SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser)
-    : m_client(_client), m_hnd(_hnd), m_ser(_ser) {
+SpaceControlClient::SpaceControlClient(gloox::Client* _client, 
+				       SpaceControlHandler* _hnd, 
+				       SpaceCommandSerializer* _ser,
+				       AccessFilter* _access
+				      )
+    : m_client(_client), m_hnd(_hnd), m_ser(_ser), m_access(_access) {
     if (_client)
         _client->registerMessageSessionHandler(this);
 }
@@ -343,6 +347,11 @@ SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
 
     // return sink that is not shared
     return new Sink(session, m_ser, false);
+}
+
+const AccessFilter* SpaceControlClient::access() const throw()
+{
+  return m_access;
 }
 
 

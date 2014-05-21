@@ -30,6 +30,7 @@
 #include <gloox/messagehandler.h>
 #include <gloox/messagesessionhandler.h>
 
+#include "accessfilter.h"
 
 namespace xmppsc {
 
@@ -313,7 +314,7 @@ public:
      * \param _hnd the space control handler to process the received Space Commands
      * \param _ser the space command serializer
      */
-    SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser);
+    SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser, AccessFilter* _access);
 
     //! message session handler
     /*!
@@ -347,6 +348,8 @@ public:
      * \returns a space command sink with a new session.
      */
     SpaceCommandSink* create_sink(gloox::JID peer);
+    
+    const AccessFilter* access() const throw();
 
 protected:
     //! Get the space command serializer
@@ -359,6 +362,7 @@ private:
     gloox::Client* m_client;
     SpaceControlHandler* m_hnd;
     SpaceCommandSerializer* m_ser;
+    AccessFilter* m_access;
 };
 
 }

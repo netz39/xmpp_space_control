@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     }
 
     xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
-    
+
     i2ch->add_method(new xmppsc::I2CReadMethod(broker));
     i2ch->add_method(new xmppsc::I2CRead8Method(broker));
     i2ch->add_method(new xmppsc::I2CRead16Method(broker));
@@ -36,8 +36,9 @@ int main(int argc, char **argv) {
 
 
     if (client) {
+        // TODO add access filter
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
-                new xmppsc::TextSpaceCommandSerializer());
+                new xmppsc::TextSpaceCommandSerializer(), NULL);
 
         if (!client->connect(true))
             std::cerr << "could not connect!" << std::endl;
