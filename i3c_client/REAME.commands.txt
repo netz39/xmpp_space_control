@@ -84,3 +84,26 @@ Wenn ein Statuswechsel eintritt, für den eine Anfrage andere Rückgabewerte lie
 [Auch hier ist der Prozess verbesserungswürdig.]
 
 
+Die I3C Methods bieten ein direktes Call Command an:
+
+Command:	i3c.call
+Paramter:	device	I2C-Zieldevice der Anfragen
+		command	I3C-Kommando
+		data	I3C-Daten (optional)
+Beschreibung:	I3C-Aufruf kodieren und per I2C absetzen. Der Aufruf wird bis zu 20 Mal wiederholt.
+
+Neben i2c.exception sind folgende Rückgaben möglich:
+
+Command:	i3c.response
+Parameter:	device, command, data wie bei i3c.call
+		response	die I3C-Response
+		i2c.register	I2C-Register-Wert
+		i2c.response	die I2C-Response
+Beschreibung: 	Antwort auf einen I3C-Call
+
+Command:	i3c.timeout
+Parameter:	device, command, data wie bei i3c.call
+		response	die I3C-Response
+		i2c.register	I2C-Register-Wert
+Beschreibung: 	I3C-Call konnte nicht erfolgreich durchgeführt werden.
+
