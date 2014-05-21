@@ -99,8 +99,8 @@ const char* IllegalCommandParameterException::reason() const throw()
 SpaceCommand::SpaceCommand(const std::string& _cmd,
                            const space_command_params& _params) throw()
     : m_cmd(_cmd), m_params(_params) {}
-    
-SpaceCommand::SpaceCommand(const SpaceCommand& other)    
+
+SpaceCommand::SpaceCommand(const SpaceCommand& other)
     : m_cmd(other.m_cmd), m_params(other.m_params) {}
 
 const std::string& SpaceCommand::cmd() const throw() {
@@ -110,8 +110,8 @@ const std::string& SpaceCommand::cmd() const throw() {
 const std::string& SpaceCommand::param(const std::string& key) const
 throw(MissingCommandParameterException) {
     space_command_params::const_iterator it = m_params.find(key);
-    
-    if (it == m_params.end()) 
+
+    if (it == m_params.end())
         throw MissingCommandParameterException(key);
 
     return it->second;
@@ -276,11 +276,11 @@ CommandMethod::t_command_set& CommandMethod::command_set() {
 }
 
 
-SpaceControlClient::SpaceControlClient(gloox::Client* _client, 
-				       SpaceControlHandler* _hnd, 
-				       SpaceCommandSerializer* _ser,
-				       AccessFilter* _access
-				      )
+SpaceControlClient::SpaceControlClient(gloox::Client* _client,
+                                       SpaceControlHandler* _hnd,
+                                       SpaceCommandSerializer* _ser,
+                                       AccessFilter* _access
+                                      )
     : m_client(_client), m_hnd(_hnd), m_ser(_ser), m_access(_access) {
     if (_client)
         _client->registerMessageSessionHandler(this);
@@ -298,13 +298,21 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             // may throw a SpaceCommandFormatException
             const SpaceCommand cmd = serializer()->to_command(msg.body());
 
-            // create shared sink
-            Sink sink(session, m_ser, true);
+            // check for access
+	    if (m_access ? m_access->accepted(msg.from()) : true) {
+                // create shared sink
+                Sink sink(session, m_ser, true);
 
-            // call handler
-            if (m_hnd)
-                m_hnd->handleSpaceCommand(session->target(), cmd, &sink);
-
+                // call handler
+                if (m_hnd)
+                    m_hnd->handleSpaceCommand(session->target(), cmd, &sink);
+            } else {
+                // send access denied message
+                SpaceCommand::space_command_params par;
+		par["reason"] = "Denied by access filter!";
+                SpaceCommand ex("denied", par);
+                session->send(serializer()->to_body(ex));
+            }
         } catch (SpaceCommandFormatException& scfe) {
             SpaceCommand::space_command_params par;
             par["what"] = scfe.what();
@@ -351,7 +359,7 @@ SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
 
 const AccessFilter* SpaceControlClient::access() const throw()
 {
-  return m_access;
+    return m_access;
 }
 
 

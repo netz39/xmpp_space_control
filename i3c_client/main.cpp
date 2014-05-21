@@ -36,14 +36,19 @@ int main(int argc, char **argv) {
 
 
     if (client) {
-        // TODO add access filter
+      	xmppsc::ListAccessFilter::jid_list jids;
+	//TODO load the JIDs
+      
+	xmppsc::ListAccessFilter* af = new xmppsc::ListAccessFilter(jids);
+      
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
-                new xmppsc::TextSpaceCommandSerializer(), NULL);
+                new xmppsc::TextSpaceCommandSerializer(), af);
 
         if (!client->connect(true))
             std::cerr << "could not connect!" << std::endl;
 
         delete client;
+	delete af;
     }
 
     delete broker;

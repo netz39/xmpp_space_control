@@ -55,7 +55,7 @@ public:
 
     const jid_list& jids() const throw();
     
-    virtual bool accepted(const gloox::JID& jid) const throw() = 0;
+    virtual bool accepted(const gloox::JID& jid) const throw();
 private:
   const jid_list m_jids;
 };

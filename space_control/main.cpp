@@ -22,6 +22,7 @@
 
 #include "configuredclientfactory.h"
 #include "spacecontrolclient.h"
+#include "accessfilter.h"
 
 using namespace std;
 using namespace gloox;
