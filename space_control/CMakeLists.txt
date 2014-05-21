@@ -14,7 +14,8 @@ else()
 endif()
 
 
-add_executable(xmpp_space_control main.cpp configuredclientfactory.cpp spacecontrolclient.cpp daemon.cpp methodhandler.cpp accessfilter.cpp)
+# WARNING: Undefined reference to main, this must become a library!
+add_library(xmpp_space_control SHARED configuredclientfactory.cpp spacecontrolclient.cpp daemon.cpp methodhandler.cpp accessfilter.cpp)
 
 find_library(GLOOX_LIBRARY gloox)
 target_link_libraries(xmpp_space_control ${GLOOX_LIBRARY})
