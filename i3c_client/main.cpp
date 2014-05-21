@@ -17,9 +17,11 @@ int main(int argc, char **argv) {
     //std::cout << std::hex << "0x" << ep->read_reg_16(0x95) << std::endl;
 
     gloox::Client* client=0;
+    xmppsc::AccessFilter* af=0;
     try {
         xmppsc::ConfiguredClientFactory ccf("spacecontrol.config");
         client = ccf.newClient();
+        af = ccf.newAccessFilter();
     } catch (xmppsc::ConfiguredClientFactoryException &ccfe) {
         std::cerr << "ConfiguredClientFactoryException: " << ccfe.what() << std::endl;
         return (-1);
@@ -36,11 +38,6 @@ int main(int argc, char **argv) {
 
 
     if (client) {
-      	xmppsc::ListAccessFilter::jid_list jids;
-	//TODO load the JIDs
-      
-	xmppsc::ListAccessFilter* af = new xmppsc::ListAccessFilter(jids);
-      
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
@@ -48,8 +45,10 @@ int main(int argc, char **argv) {
             std::cerr << "could not connect!" << std::endl;
 
         delete client;
-	delete af;
     }
+
+    if (af)
+        delete af;
 
     delete broker;
 

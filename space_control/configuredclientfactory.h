@@ -18,6 +18,8 @@
 #ifndef CONFIGUREDCLIENTFACTORY_H__
 #define CONFIGUREDCLIENTFACTORY_H__
 
+#include "accessfilter.h"
+
 #include <exception>
 
 #include <libconfig.h++>
@@ -85,6 +87,9 @@ public:
      * \sa gloox::Client
      */
     gloox::Client* newClient(const char* _resource = 0) throw(ConfiguredClientFactoryException);
+    
+    //! Create a new access filter from the configuration.
+    AccessFilter* newAccessFilter() throw(ConfiguredClientFactoryException);
 
 private:
     std::string m_filename;

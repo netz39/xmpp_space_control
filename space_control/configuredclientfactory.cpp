@@ -71,6 +71,33 @@ gloox::Client* ConfiguredClientFactory::newClient(const char* _resource) throw(C
     return client;
 }
 
+AccessFilter* ConfiguredClientFactory::newAccessFilter() throw(ConfiguredClientFactoryException)
+{
+    // check config
+    if (!m_cfg)
+        loadConfig();
+
+    ListAccessFilter* af = NULL;
+
+    try {
+        // load JID list from config
+        libconfig::Setting& s_access = m_cfg->lookup("xmpp.access");
+
+        // target list for found JIDs
+        ListAccessFilter::jid_list jidlist;
+	
+        for (int i = 0; i < s_access.getLength(); i++)
+           jidlist.push_back(gloox::JID(s_access[i]));
+
+        af = new ListAccessFilter(jidlist);
+    } catch (const libconfig::SettingNotFoundException& snfex) {
+        // af is already null;
+    }
+
+    return af;
+}
+
+
 void ConfiguredClientFactory::loadConfig() throw(ConfiguredClientFactoryException) {
     // delete old config
     if (m_cfg)
