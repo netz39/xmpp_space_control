@@ -18,13 +18,31 @@
 #ifndef ACCESSFILTER_H__
 #define ACCESSFILTER_H__
 
+#include <gloox/jid.h>
 
 
 namespace xmppsc {
-  
-  
-  
-  
+
+//! General access filter interface.
+/*!
+ * The access filter decides whether a specific JID is alled for the target service.
+ */
+class AccessFilter {
+public:
+    AccessFilter();
+
+    virtual ~AccessFilter() throw();
+
+    //! Check if JID is accepted.
+    /*!
+     * @param jid the JID to be checked
+     * @returns true if the JID can be accepted, otherwise false
+     */
+    virtual bool accepted(const gloox::JID& jid) throw() = 0;
+};
+
+
+
 } // namespace xmppsc
 
 #endif //ACCESSFILTER_H__
