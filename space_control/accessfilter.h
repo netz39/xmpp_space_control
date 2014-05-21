@@ -18,7 +18,7 @@
 #ifndef ACCESSFILTER_H__
 #define ACCESSFILTER_H__
 
-#include <set>
+#include <vector>
 
 #include <gloox/jid.h>
 
@@ -47,7 +47,7 @@ public:
 class ListAccessFilter : public AccessFilter {
 public:
     // TODO compare method
-    typedef std::set<gloox::JID> jid_list;
+    typedef std::vector<gloox::JID> jid_list;
 
     ListAccessFilter(const jid_list& jids) throw();
     

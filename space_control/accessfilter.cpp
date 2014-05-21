@@ -37,7 +37,25 @@ const ListAccessFilter::jid_list& ListAccessFilter::jids() const throw()
 
 bool ListAccessFilter::accepted(const gloox::JID& jid) const throw()
 {
-  return m_jids.find(jid) != m_jids.end();
+    // go through the list
+    for (jid_list::const_iterator it = m_jids.begin(); it != m_jids.end(); ++it) {
+        const gloox::JID j(*it);
+
+        // if a ressource is not specified, match the user@host part only
+        if (j.resource().empty() && !j.bare().compare(jid.bare()))
+            return true;
+
+        // otherwise, match completely
+        // (the == operator is overloaded to compare the full JID
+        if (j == jid)
+            return true;
+
+        // Hint: We suspect that jid will always have a resource set,
+        //       as this is the case with actual (live) JIDs.
+    }
+
+    // nothing matched
+    return false;
 }
 
 
