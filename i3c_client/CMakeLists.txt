@@ -17,6 +17,7 @@ endif(WIRINGPI_LIBRARY)
 
 add_executable(i3c_client main.cpp i2cmethods.cpp 
 				   i2cendpoint.cpp i2cendpoint_${I2C_ENDPOINT_IMPL}.cpp
+				   i3cmethods.cpp
 						  ../space_control/configuredclientfactory.cpp
                                                   ../space_control/spacecontrolclient.cpp
                                                   ../space_control/methodhandler.cpp

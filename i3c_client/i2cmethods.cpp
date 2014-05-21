@@ -24,8 +24,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace
-{
+namespace xmppsc {
 
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 {
@@ -61,7 +60,7 @@ template< typename T > const std::string int2hex(T i)
     return stream.str();
 }
 
-int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required=true, int def=0)
+int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required, int def)
 throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameterException) {
     try {
         const std::string _val = sc.param(parameter);
@@ -74,11 +73,6 @@ throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameter
         return def;
     }
 }
-
-} // anon namespace
-
-
-namespace xmppsc {
 
 
 I2CMethodBase::I2CMethodBase(const std::string& command, I2CEndpointBroker* broker) throw(std::invalid_argument)
@@ -100,14 +94,6 @@ I2CMethodBase::~I2CMethodBase() throw () {}
 I2CReadMethod::I2CReadMethod(I2CEndpointBroker* broker): I2CMethodBase("i2c.read", broker) {}
 
 I2CReadMethod::~I2CReadMethod() throw () {}
-
-#define I2C_EX_MSG \
-        xmppsc::SpaceCommand::space_command_params params; \
-        params["what"] = e.what(); \
-        params["device"] = int2hex(e.address()); \
-	params["error"] = e.error(); \
-        const xmppsc::SpaceCommand ex("i2c.exception", params); \
-        sink->sendSpaceCommand(ex); \
  
 void I2CReadMethod::handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink *sink)
 {
