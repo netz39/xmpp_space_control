@@ -6,6 +6,7 @@
 
 
 #include "i2cmethods.h"
+#include "i3cmethods.h"
 #include "i2cendpoint.h"
 
 
@@ -35,6 +36,7 @@ int main(int argc, char **argv) {
     i2ch->add_method(new xmppsc::I2CWriteMethod(broker));
     i2ch->add_method(new xmppsc::I2CWrite8Method(broker));
     i2ch->add_method(new xmppsc::I2CWrite16Method(broker));
+    i2ch->add_method(new xmppsc::I3CCallMethod(broker));
 
 
     if (client) {
