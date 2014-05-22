@@ -39,3 +39,30 @@ INSTALL(FILES ${headers}
 INSTALL(FILES spacecontrol.config.example
   DESTINATION ${CMAKE_INSTALL_DOCDIR}
 )
+
+
+# Packaging
+# see http://www.cmake.org/Wiki/CMake:Packaging_With_CPack#Using_CMake_variables_to_configure_CPack
+
+INCLUDE(InstallRequiredSystemLibraries)
+
+# Generate Debian packages
+#  It seems that the debian generator cannot create different debian packages from one CMake source.
+#  (Components do not solve the problem.)
+SET(CPACK_GENERATOR "DEB")
+
+
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "XMPP SpaceControl client library")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Stefan Haun <tux@netz39.de>")
+# TODO create those files
+#SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+#SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "1")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
+#  SET(CPACK_STRIP_FILES "bin/MyExecutable")
+#  SET(CPACK_SOURCE_STRIP_FILES "")
+#SET(CPACK_PACKAGE_EXECUTABLES "MyExecutable" "My Executable")
+INCLUDE(CPack)
+
