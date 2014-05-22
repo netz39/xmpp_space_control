@@ -1,4 +1,4 @@
-project(xmpp_space_control)
+project(xmppsc-client)
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -14,11 +14,12 @@ else()
 endif()
 
 
-# WARNING: Undefined reference to main, this must become a library!
-add_library(xmpp_space_control SHARED configuredclientfactory.cpp spacecontrolclient.cpp daemon.cpp methodhandler.cpp accessfilter.cpp)
+# Build the library
+FILE(GLOB sources "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+add_library(xmppsc-client SHARED ${sources})
 
 find_library(GLOOX_LIBRARY gloox)
-target_link_libraries(xmpp_space_control ${GLOOX_LIBRARY})
+target_link_libraries(xmppsc-client ${GLOOX_LIBRARY})
 
 find_library(CONFIG_LIBRARY config++)
-target_link_libraries(xmpp_space_control ${CONFIG_LIBRARY})
+target_link_libraries(xmppsc-client ${CONFIG_LIBRARY})
