@@ -17,7 +17,7 @@ endif()
 
 
 # Build the library
-FILE(GLOB sources "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB sources "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_library(xmppsc-client SHARED ${sources})
 
 find_library(GLOOX_LIBRARY gloox)
@@ -28,15 +28,15 @@ target_link_libraries(xmppsc-client ${CONFIG_LIBRARY})
 
 
 # Installation stuff
-INSTALL(TARGETS xmppsc-client 
+install(TARGETS xmppsc-client 
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-INSTALL(FILES ${headers}
+file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+install(FILES ${headers}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xmppsc
 )
-INSTALL(FILES spacecontrol.config.example
+install(FILES spacecontrol.config.example
   DESTINATION ${CMAKE_INSTALL_DOCDIR}
 )
 
@@ -44,25 +44,25 @@ INSTALL(FILES spacecontrol.config.example
 # Packaging
 # see http://www.cmake.org/Wiki/CMake:Packaging_With_CPack#Using_CMake_variables_to_configure_CPack
 
-INCLUDE(InstallRequiredSystemLibraries)
+include(InstallRequiredSystemLibraries)
 
 # Generate Debian packages
 #  It seems that the debian generator cannot create different debian packages from one CMake source.
 #  (Components do not solve the problem.)
-SET(CPACK_GENERATOR "DEB")
+set(CPACK_GENERATOR "DEB")
 
 
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "XMPP SpaceControl client library")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Stefan Haun <tux@netz39.de>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "XMPP SpaceControl client library")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Stefan Haun <tux@netz39.de>")
 # TODO create those files
-#SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
-#SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "1")
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
-#  SET(CPACK_STRIP_FILES "bin/MyExecutable")
-#  SET(CPACK_SOURCE_STRIP_FILES "")
-#SET(CPACK_PACKAGE_EXECUTABLES "MyExecutable" "My Executable")
-INCLUDE(CPack)
+#set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+#set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
+#  set(CPACK_STRIP_FILES "bin/MyExecutable")
+#  set(CPACK_SOURCE_STRIP_FILES "")
+#set(CPACK_PACKAGE_EXECUTABLES "MyExecutable" "My Executable")
+include(CPack)
 
