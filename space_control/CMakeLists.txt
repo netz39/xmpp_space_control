@@ -2,6 +2,8 @@ project(xmppsc-client)
 
 cmake_minimum_required(VERSION 2.8)
 
+include(GNUInstallDirs)
+
 # Check for C++11 standard
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -23,3 +25,17 @@ target_link_libraries(xmppsc-client ${GLOOX_LIBRARY})
 
 find_library(CONFIG_LIBRARY config++)
 target_link_libraries(xmppsc-client ${CONFIG_LIBRARY})
+
+
+# Installation stuff
+INSTALL(TARGETS xmppsc-client 
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+FILE(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+INSTALL(FILES ${headers}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xmppsc
+)
+INSTALL(FILES spacecontrol.config.example
+  DESTINATION ${CMAKE_INSTALL_DOCDIR}
+)
