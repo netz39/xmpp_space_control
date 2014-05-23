@@ -241,6 +241,8 @@ public:
      * \param sc The space command to be sent.
      */
     virtual void sendSpaceCommand(const SpaceCommand& sc) = 0;
+    
+    virtual std::string context() const throw() = 0;
 };
 
 

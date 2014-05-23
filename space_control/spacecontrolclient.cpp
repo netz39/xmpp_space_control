@@ -241,7 +241,8 @@ public:
     virtual ~Sink();
 
     virtual void sendSpaceCommand(const SpaceCommand& sc);
-
+    virtual std::string context() const throw();
+    
 private:
     SpaceCommandSerializer* m_ser;
     gloox::MessageSession* m_session;
@@ -259,6 +260,11 @@ void Sink::sendSpaceCommand(const SpaceCommand& sc) {
     }
     //TODO else
 }
+
+std::string Sink::context() const throw() {
+  return m_session ? m_session->threadID() : "";
+}
+
 
 
 CommandMethod::CommandMethod(CommandMethod::t_command_set _commands)
