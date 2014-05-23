@@ -1,0 +1,109 @@
+I2C SpaceControl Commands
+=========================
+
+Jedes der Kommandos verarbeitet ein (sub)set der folgenden Parameter:
+
+device		I2C-Adresse des Zieldevices
+register	I2C-Registernummer
+data		Datenwert
+
+Rückgabewerte werden in "response" gespeichert. Dabei wird auch das komplette Query-Parameterset mitgeliefert, sodass aus der Antwortnachricht die komplette Anfrage rekonstruiert werden kann.
+
+
+Im Folgenden sind die verfügbaren Commands mit Parametern angegeben, wobei alle angegebenen Parameter REQUIRED sind.
+
+
+Command: 	i2c.read
+Parameter: 	device
+Beschreibung: 	Einfache I2C-Leseoperation auf dem Device.
+
+Command 	i2c.read8
+Parameter: 	device, register
+Beschreibung: 	8-bit-Wert von Register lesen
+
+Command 	i2c.read16
+Parameter: 	device, register
+Beschreibung: 	16-bit-Wert von Register lesen
+
+Command: 	i2c.write
+Parameter: 	device, data
+Beschreibung: 	Einfache I2C-Schreiboperation auf das Device.
+
+Command: 	i2c.write8
+Parameter: 	device, register, data
+Beschreibung: 	8-bit-Wert data in register des device schreiben.
+
+Command: 	i2c.write16
+Parameter: 	device, register, data
+Beschreibung: 	16-bit-Wert data in register des device schreiben.
+
+
+Die Commands ergeben sich aus den Funktionen der wiringPi-Bibliothek.
+
+
+Folgende Rückgaben sind möglich:
+
+Command: 	i2c.update
+Parameter: 	device, <register>, <data>, response
+Beschreibung: 	Rückgabe eines Operationsergebnisses
+
+Command: 	i2c.exception
+Parameter:	what 	Exception-Message
+		device	I2C-Zieldevice der Anfrage
+		error	I2C-Fehlermeldung
+Beschreibung: 	Eine I2C-Exception ist aufgetreten, die Anfrage war nicht erfolgreich.
+
+
+I3C Commands
+============
+
+I3C (Interruptible Inter-Integrated Circuit) erweitert I2C um eine Interrupt-Leitung und ein Kommmandoformat für einfache Device-Kommunikation.
+
+Anfragen werden grundsätzlich über i2c.read16 gestellt. Dabei wird die eigentliche Anfrage in der Registeradresse kodiert.
+
+Das Register ist wie folgt belegt:
+
+    +---+-----+------+
+    | P | CCC | DDDD |
+    +---+-----+------+
+    
+    P ... Parity
+    C ... Command
+    D ... Data
+
+Aufrufe haben also immer die Form Command(Data), Parity ist die Anzahl der gesetzten Bits mod 2 (ohne Parity selbst). Die Belegung der Commands hängt vom jeweiligen Device ab.
+
+Die 16 Bit Rückgabe bestehen aus einer 8-Bit-Antwort und der invertierten Antwort. Gibt es dort Diskrepanzen, muss das Ergebnis als ungültig betrachtet werden (kann aber trotzdem Seiteneffekte ausgelöst haben)!
+
+Ein Rückgabewert von 0 bedeutet, dass das Register fehlerhaft war (fehlerhafte Parität) und die Anfrage verworfen wurde. Alle anderen Werte sind von der Anwendung spezifiziert.
+
+[Die Prüfsummenverfahren können überarbeitet werden …]
+
+Wenn ein Statuswechsel eintritt, für den eine Anfrage andere Rückgabewerte liefert, wird die Interrupt-Leitung aktiviert. Wurde die entsprechende Anfrage durchgeführt, wird der Interrupt zurückgesetzt.
+
+[Auch hier ist der Prozess verbesserungswürdig.]
+
+
+Die I3C Methods bieten ein direktes Call Command an:
+
+Command:	i3c.call
+Paramter:	device	I2C-Zieldevice der Anfragen
+		command	I3C-Kommando
+		data	I3C-Daten (optional)
+Beschreibung:	I3C-Aufruf kodieren und per I2C absetzen. Der Aufruf wird bis zu 20 Mal wiederholt.
+
+Neben i2c.exception sind folgende Rückgaben möglich:
+
+Command:	i3c.response
+Parameter:	device, command, data wie bei i3c.call
+		response	die I3C-Response
+		i2c.register	I2C-Register-Wert
+		i2c.response	die I2C-Response
+Beschreibung: 	Antwort auf einen I3C-Call
+
+Command:	i3c.timeout
+Parameter:	device, command, data wie bei i3c.call
+		response	die I3C-Response
+		i2c.register	I2C-Register-Wert
+Beschreibung: 	I3C-Call konnte nicht erfolgreich durchgeführt werden.
+
