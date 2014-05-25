@@ -26,25 +26,69 @@ void wait_for_state(const gloox::Client* client, const gloox::ConnectionState& s
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
-class I3CResponseMethod : public xmppsc::CommandMethod {
+class FinalizingCommandMethod : public xmppsc::CommandMethod {
 public:
-    I3CResponseMethod(gloox::Client* _client) throw()
-        : CommandMethod("i3c.response"), m_client(_client) {}
-    virtual ~I3CResponseMethod() throw() {}
+    FinalizingCommandMethod(gloox::Client* _client, const std::string _command)
+        : CommandMethod(_command), m_client(_client) {}
+
+    FinalizingCommandMethod(gloox::Client* _client, const t_command_set& _commands)
+        : CommandMethod(_commands), m_client(_client) {}
+
+    //! Evaluate the result and decide if the client may be terminated.
+    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) = 0;
 
     virtual void handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-        // TODO evaluate result
-
-        std::cout << "Disconnect." << std::endl;
-        m_client->disconnect();
-        wait_for_state(m_client, gloox::ConnectionState::StateDisconnected);
-
+        if (evaluate_result(peer, sc, sink)) {
+            client()->disconnect();
+            wait_for_state(client(), gloox::ConnectionState::StateDisconnected);
+        }
     }
+protected:
+    gloox::Client* client() const throw() {
+        return m_client;
+    }
+
 private:
     gloox::Client* m_client;
 };
 
+class I3CResponseMethod : public FinalizingCommandMethod {
+public:
+    I3CResponseMethod(gloox::Client* _client) throw()
+        : FinalizingCommandMethod(_client, "i3c.response") {}
+    virtual ~I3CResponseMethod() throw() {}
 
+    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
+        // TODO evaluate result
+
+        std::cout << "Disconnect." << std::endl;
+
+        return true;
+    }
+};
+
+class I3CErrorHandler : public FinalizingCommandMethod {
+public:
+    I3CErrorHandler(gloox::Client* _client) throw()
+        : FinalizingCommandMethod(_client, CommandMethod::t_command_set(c_ec, c_ec+2))  {}
+
+    virtual ~I3CErrorHandler() throw() {}
+
+    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
+        // TODO evaluate result
+
+
+        std::cout << "Disconnect." << std::endl;
+        return true;
+    }
+private:
+    const std::string c_ec[2] {"i3c.timeout", "exception"};
+};
+
+
+
+
+//TODO exception handling
 
 int main(int argc, char **argv) {
     //TODO evaluate CLI arguments
@@ -70,6 +114,7 @@ int main(int argc, char **argv) {
     if (client) {
         xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
         mh->add_method(new I3CResponseMethod(client));
+	mh->add_method(new I3CErrorHandler(client));
 
 
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, mh,
