@@ -356,7 +356,7 @@ public:
      * \param peer The communication peer for the session.
      * \returns a space command sink with a new session.
      */
-    SpaceCommandSink* create_sink(gloox::JID peer);
+    SpaceCommandSink* create_sink(const gloox::JID& peer, const std::string& threadId);
     
     const AccessFilter* access() const throw();
 

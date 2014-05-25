@@ -362,14 +362,8 @@ SpaceCommandSerializer* SpaceControlClient::serializer() {
     return this->m_ser;
 }
 
-
-SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
-    gloox::MessageSession* session = new gloox::MessageSession(this->m_client, peer);
-
-    //TODO thread ID
-    const std::string threadId("testId");
-
-    // return sink that is not shared
+SpaceCommandSink* SpaceControlClient::create_sink(const gloox::JID& peer, const std::string& threadId) {
+    // return sink 
     return new Sink(threadId, peer, m_client, m_ser);
 
 }
