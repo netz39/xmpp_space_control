@@ -28,7 +28,6 @@
 #include <gloox/message.h>
 #include <gloox/messagesession.h>
 #include <gloox/messagehandler.h>
-#include <gloox/messagesessionhandler.h>
 
 #include "accessfilter.h"
 
@@ -315,7 +314,7 @@ private:
  * An XMPP client, that listens for XMPP messages, converts them to
  * Space Commands and deals with the Space Command handler.
  */
-class SpaceControlClient : public gloox::MessageSessionHandler, gloox::MessageHandler {
+class SpaceControlClient : public gloox::MessageHandler {
 public:
     //! Create the space control client
     /*!
@@ -324,12 +323,6 @@ public:
      * \param _ser the space command serializer
      */
     SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser, AccessFilter* _access);
-
-    //! message session handler
-    /*!
-     * \sa gloox::MessageSessionHandler::handleMessageSession
-     */
-    virtual void handleMessageSession(gloox::MessageSession* session);
 
     //! message handler
     /*!

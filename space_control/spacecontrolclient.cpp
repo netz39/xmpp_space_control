@@ -23,6 +23,8 @@
 #include <sstream>
 #include <cstdlib>
 
+#include <gloox/messagesession.h>
+
 
 namespace xmppsc {
 
@@ -294,12 +296,7 @@ SpaceControlClient::SpaceControlClient(gloox::Client* _client,
                                       )
     : m_client(_client), m_hnd(_hnd), m_ser(_ser), m_access(_access) {
     if (_client)
-        _client->registerMessageSessionHandler(this);
-}
-
-void SpaceControlClient::handleMessageSession(gloox::MessageSession* session) {
-    std::cout << "Message session from " << session->target().full() << std::endl;
-    session->registerMessageHandler(this);
+        m_client->registerMessageHandler(this);
 }
 
 void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::MessageSession* session) {
