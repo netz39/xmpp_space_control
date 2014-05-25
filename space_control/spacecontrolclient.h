@@ -203,7 +203,7 @@ public:
      * \param cmd Pointer to the space command, must not be null
      * \returns The serialized message as String
      */
-    virtual std::string to_body(const SpaceCommand& cmd) = 0;
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) = 0;
 
     //! De-Serialize a received Space Command
     /*!
@@ -222,7 +222,7 @@ public:
 
     virtual ~TextSpaceCommandSerializer();
 
-    virtual std::string to_body(const SpaceCommand& cmd);
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId);
 
     virtual SpaceCommand to_command(const std::string body)
     throw(SpaceCommandFormatException);

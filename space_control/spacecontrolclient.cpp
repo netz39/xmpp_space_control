@@ -129,7 +129,7 @@ TextSpaceCommandSerializer::TextSpaceCommandSerializer() {}
 
 TextSpaceCommandSerializer::~TextSpaceCommandSerializer() {}
 
-std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd) {
+std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd, const std::string& threadId) {
 
     // build parameter list
     std::stringstream pars("");
@@ -162,6 +162,7 @@ std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd) {
     // build message body
     std::stringstream body;
     body << cmd.cmd();
+    body << threadId;
     if (!pars.str().empty())
         body << std::endl << pars.str();
 
@@ -259,7 +260,7 @@ Sink::~Sink() {
 
 void Sink::sendSpaceCommand(const SpaceCommand& sc) {
     if (m_session) {
-        m_session->send(m_ser->to_body(sc));
+        m_session->send(m_ser->to_body(sc, threadId()));
     }
     //TODO else
 }
@@ -311,11 +312,15 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             // create the command
             // may throw a SpaceCommandFormatException
             const SpaceCommand cmd = serializer()->to_command(msg.body());
+	    
+	    //TODO get thread ID
+	    const std::string threadId(session->threadID());
 
             // check for access
 	    if (m_access ? m_access->accepted(msg.from()) : true) {
                 // create shared sink
                 Sink sink(session, m_ser, true);
+		sink.set_threadId(threadId);
 
                 // call handler
                 if (m_hnd)
@@ -325,7 +330,7 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
                 SpaceCommand::space_command_params par;
 		par["reason"] = "Denied by access filter!";
                 SpaceCommand ex("denied", par);
-                session->send(serializer()->to_body(ex));
+                session->send(serializer()->to_body(ex, threadId));
             }
         } catch (SpaceCommandFormatException& scfe) {
             SpaceCommand::space_command_params par;
@@ -346,7 +351,7 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
 
             SpaceCommand ex("exception", par);
 
-            session->send(serializer()->to_body(ex));
+            session->send(serializer()->to_body(ex, session->threadID()));
         }
     //TODO else warn
 }
