@@ -303,51 +303,51 @@ void SpaceControlClient::handleMessageSession(gloox::MessageSession* session) {
 }
 
 void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::MessageSession* session) {
-    if (session)
-        try {
-            // create the command
-            // may throw a SpaceCommandFormatException
-            const SpaceCommandSerializer::Incoming in = serializer()->to_command(msg.body());
-            const std::string threadId(in.first);
-            const SpaceCommand cmd = in.second;
+    try {
+        // create the command
+        // may throw a SpaceCommandFormatException
+        const SpaceCommandSerializer::Incoming in = serializer()->to_command(msg.body());
+        const std::string threadId(in.first);
+        const SpaceCommand cmd = in.second;
 
-            // check for access
-            if (m_access ? m_access->accepted(msg.from()) : true) {
-                // create shared sink
-                Sink sink(threadId, msg.from(), m_client, m_ser);
+        // create shared sink
+        Sink sink(threadId, msg.from(), m_client, m_ser);
 
-                // call handler
-                if (m_hnd)
-                    m_hnd->handleSpaceCommand(session->target(), cmd, &sink);
-            } else {
-                // send access denied message
-                SpaceCommand::space_command_params par;
-                par["reason"] = "Denied by access filter!";
-                SpaceCommand ex("denied", par);
-                session->send(serializer()->to_body(ex, threadId));
-            }
-        } catch (SpaceCommandFormatException& scfe) {
+        // check for access
+        if (m_access ? m_access->accepted(msg.from()) : true) {
+
+            // call handler
+            if (m_hnd)
+                m_hnd->handleSpaceCommand(msg.from(), cmd, &sink);
+        } else {
+            // send access denied message
             SpaceCommand::space_command_params par;
-            par["what"] = scfe.what();
-            par["body"] = scfe.body();
+            par["reason"] = "Denied by access filter!";
+            SpaceCommand ex("denied", par);
+            sink.sendSpaceCommand(ex);
+        }
+    } catch (SpaceCommandFormatException& scfe) {
+        SpaceCommand::space_command_params par;
+        par["what"] = scfe.what();
+        par["body"] = scfe.body();
 
-            // add line number if available
-            if (scfe.line_number()) {
+        // add line number if available
+        if (scfe.line_number()) {
 // use std::to_string if available
 #ifdef COMPILER_SUPPORTS_CXX11
-                par["line number"] = std::to_string(scfe.line_number());
+            par["line number"] = std::to_string(scfe.line_number());
 #else // COMPILER_SUPPORTS_CXX11
-                std::stringstream s;
-                s << scfe.line_number();
-                par["line number"] = s.str();
+            std::stringstream s;
+            s << scfe.line_number();
+            par["line number"] = s.str();
 #endif // COMPILER_SUPPORTS_CXX11
-            }
-
-            SpaceCommand ex("exception", par);
-
-            session->send(serializer()->to_body(ex, session->threadID()));
         }
-    //TODO else warn
+
+        SpaceCommand ex("exception", par);
+
+        m_client->send(gloox::Message(gloox::Message::Normal, msg.from(),
+                                      serializer()->to_body(ex, session->threadID())));
+    }
 }
 
 gloox::Client* SpaceControlClient::client() {
@@ -363,7 +363,7 @@ SpaceCommandSerializer* SpaceControlClient::serializer() {
 }
 
 SpaceCommandSink* SpaceControlClient::create_sink(const gloox::JID& peer, const std::string& threadId) {
-    // return sink 
+    // return sink
     return new Sink(threadId, peer, m_client, m_ser);
 
 }
