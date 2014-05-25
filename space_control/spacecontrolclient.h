@@ -241,6 +241,10 @@ public:
      * \param sc The space command to be sent.
      */
     virtual void sendSpaceCommand(const SpaceCommand& sc) = 0;
+
+    //TODO documentation
+    virtual std::string threadId() const throw() = 0;    
+    virtual void set_threadId(const std::string _id) throw() = 0;
 };
 
 
