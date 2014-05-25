@@ -11,13 +11,10 @@
 #include "../i3c_client/i2cmethods.h"
 
 void run_client(gloox::Client* client) {
-    std::cout << "Connecting GLOOX client." << std::endl;
     if (!client->connect(true)) {
         std::cerr << "could not connect!" << std::endl;
         return;
     }
-
-    std::cout << "Client connection finished." << std::endl;
 }
 
 void wait_for_state(const gloox::Client* client, const gloox::ConnectionState& state) {
@@ -108,7 +105,21 @@ public:
     }
 };
 
-//TODO exception handling (denied)
+class I3CDeniedHandler : public FinalizingCommandMethod {
+public:
+    I3CDeniedHandler(gloox::Client* _client) throw()
+        : FinalizingCommandMethod(_client, "denied")  {}
+
+    virtual ~I3CDeniedHandler() throw() {}
+
+    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
+        // print timeout error message
+
+        std::cerr << "Access denied!" << std::endl;
+
+        return true;
+    }
+};
 
 int main(int argc, char **argv) {
     //TODO evaluate CLI arguments
@@ -144,8 +155,6 @@ int main(int argc, char **argv) {
         // connect
         std::thread client_thread(run_client, client);
         wait_for_state(client, gloox::ConnectionState::StateConnected);
-        std::cout << "Connected." << std::endl;
-
 
         // Send the I3C command
         xmppsc::SpaceCommand::space_command_params parms;
@@ -166,6 +175,8 @@ int main(int argc, char **argv) {
 
 
         delete client;
+    } else {
+      std::cerr << "Could not create an XMPP client instance!" << std::endl;
     }
 
     if (af)
