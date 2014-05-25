@@ -20,6 +20,12 @@ void run_client(gloox::Client* client) {
     std::cout << "Client connection finished." << std::endl;
 }
 
+void wait_for_state(const gloox::Client* client, const gloox::ConnectionState& state) {
+    while (client->state() != state)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+}
+
 int main(int argc, char **argv) {
     //TODO evaluate CLI arguments
 
@@ -48,11 +54,7 @@ int main(int argc, char **argv) {
 
         // connect
         std::thread client_thread(run_client, client);
-
-        // wait for client to be connected
-        while (client->state() != gloox::ConnectionState::StateConnected)
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        wait_for_state(client, gloox::ConnectionState::StateConnected);
         std::cout << "Connected." << std::endl;
 
 
@@ -78,6 +80,7 @@ int main(int argc, char **argv) {
         // cleanup
         std::cout << "Disconnect." << std::endl;
         client->disconnect();
+	wait_for_state(client, gloox::ConnectionState::StateDisconnected);
 
 
         delete client;
