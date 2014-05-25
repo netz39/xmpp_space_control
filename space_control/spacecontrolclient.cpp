@@ -161,7 +161,7 @@ std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd, const s
 
     // build message body
     std::stringstream body;
-    body << cmd.cmd();
+    body << cmd.cmd() << std::endl;
     body << threadId;
     if (!pars.str().empty())
         body << std::endl << pars.str();
