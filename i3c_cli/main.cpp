@@ -59,9 +59,13 @@ public:
     virtual ~I3CResponseMethod() throw() {}
 
     virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-        // TODO evaluate result
-
-        std::cout << "Disconnect." << std::endl;
+        // evaluate result
+        try {
+            const std::string response = sc.param("response");
+            std::cout << response << std::endl;
+        } catch (const xmppsc::MissingCommandParameterException& e) {
+            std::cerr << "Missing response!" << std::endl;
+        }
 
         return true;
     }
