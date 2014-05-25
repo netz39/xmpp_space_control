@@ -169,7 +169,7 @@ std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd, const s
     return body.str();
 }
 
-SpaceCommand TextSpaceCommandSerializer::to_command(const std::string body)
+TextSpaceCommandSerializer::Incoming TextSpaceCommandSerializer::to_command(const std::string body)
 throw(SpaceCommandFormatException) {
     // the command
     std::string command;
@@ -235,7 +235,7 @@ throw(SpaceCommandFormatException) {
     }
 
     // create the command
-    return SpaceCommand(command, params);
+    return Incoming(threadId, SpaceCommand(command, params));
 }
 
 
@@ -316,10 +316,9 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
         try {
             // create the command
             // may throw a SpaceCommandFormatException
-            const SpaceCommand cmd = serializer()->to_command(msg.body());
-
-            //TODO get thread ID
-            const std::string threadId(session->threadID());
+            const SpaceCommandSerializer::Incoming in = serializer()->to_command(msg.body());
+            const std::string threadId(in.first);
+	    const SpaceCommand cmd = in.second;
 
             // check for access
             if (m_access ? m_access->accepted(msg.from()) : true) {

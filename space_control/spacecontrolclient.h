@@ -196,6 +196,8 @@ private:
 //! Interface to a Space Command serializer
 class SpaceCommandSerializer {
 public:
+    typedef std::pair<std::string, SpaceCommand> Incoming;
+  
     virtual ~SpaceCommandSerializer() = 0;
 
     //! Serialize a Space Command for sending
@@ -211,7 +213,7 @@ public:
      * \returns pointer to the created command
      * \throws SpaceCommandFormatException if the body cannot be de-serialized
      */
-    virtual SpaceCommand to_command(const std::string body)
+    virtual Incoming to_command(const std::string body)
     throw(SpaceCommandFormatException) = 0;
 };
 
@@ -224,7 +226,7 @@ public:
 
     virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId);
 
-    virtual SpaceCommand to_command(const std::string body)
+    virtual Incoming to_command(const std::string body)
     throw(SpaceCommandFormatException);
 };
 
