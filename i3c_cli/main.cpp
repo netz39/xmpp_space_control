@@ -31,7 +31,7 @@ public:
     FinalizingCommandMethod(gloox::Client* _client, const std::string _command)
         : CommandMethod(_command), m_client(_client) {}
 
-    FinalizingCommandMethod(gloox::Client* _client, const t_command_set& _commands)
+    FinalizingCommandMethod(gloox::Client* _client, const t_command_set _commands)
         : CommandMethod(_commands), m_client(_client) {}
 
     //! Evaluate the result and decide if the client may be terminated.
@@ -67,12 +67,12 @@ public:
     }
 };
 
-class I3CErrorHandler : public FinalizingCommandMethod {
+class I3CExceptionHandler : public FinalizingCommandMethod {
 public:
-    I3CErrorHandler(gloox::Client* _client) throw()
-        : FinalizingCommandMethod(_client, CommandMethod::t_command_set(c_ec, c_ec+2))  {}
+    I3CExceptionHandler(gloox::Client* _client) throw()
+        : FinalizingCommandMethod(_client, "exception")  {}
 
-    virtual ~I3CErrorHandler() throw() {}
+    virtual ~I3CExceptionHandler() throw() {}
 
     virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
         // TODO evaluate result
@@ -81,12 +81,24 @@ public:
         std::cout << "Disconnect." << std::endl;
         return true;
     }
-private:
-    const std::string c_ec[2] {"i3c.timeout", "exception"};
 };
 
 
+class I3CTimeoutHandler : public FinalizingCommandMethod {
+public:
+    I3CTimeoutHandler(gloox::Client* _client) throw()
+        : FinalizingCommandMethod(_client, "i3c.timeout")  {}
 
+    virtual ~I3CTimeoutHandler() throw() {}
+
+    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
+        // TODO evaluate result
+
+
+        std::cout << "Disconnect." << std::endl;
+        return true;
+    }
+};
 
 //TODO exception handling
 
@@ -114,7 +126,8 @@ int main(int argc, char **argv) {
     if (client) {
         xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
         mh->add_method(new I3CResponseMethod(client));
-	mh->add_method(new I3CErrorHandler(client));
+	mh->add_method(new I3CExceptionHandler(client));
+	mh->add_method(new I3CTimeoutHandler(client));
 
 
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, mh,
