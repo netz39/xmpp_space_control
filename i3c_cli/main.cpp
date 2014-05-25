@@ -156,6 +156,7 @@ int main(int argc, char **argv) {
         mh->add_method(new I3CResponseMethod(client));
         mh->add_method(new I3CExceptionHandler(client));
         mh->add_method(new I3CTimeoutHandler(client));
+        mh->add_method(new I3CDeniedHandler(client));
 
 
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, mh,
