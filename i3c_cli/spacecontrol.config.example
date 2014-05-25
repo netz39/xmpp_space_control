@@ -1,0 +1,9 @@
+xmpp: {
+  jid = "Your Jabber ID here";
+  password = "Your password here";
+
+  // Add JIDs to limit access to these.
+  // Note: An empty list will block access completely.
+  // If no list is provided, access is completely open.
+//  access = ();  
+}
