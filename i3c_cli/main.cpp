@@ -1,3 +1,4 @@
+#include <sstream>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -163,7 +164,9 @@ int main(int argc, char **argv) {
         parms["data"] = i3c_data;
         const xmppsc::SpaceCommand sc("i3c.call", parms);
 
-        xmppsc::SpaceCommandSink* sink = scc->create_sink(gloox::JID(peer), "cli_thread");
+        std::stringstream threadId("");
+        threadId << "cli_thread_" << client->resource();
+        xmppsc::SpaceCommandSink* sink = scc->create_sink(gloox::JID(peer), threadId.str());
 
         sink->sendSpaceCommand(sc);
 
@@ -176,7 +179,7 @@ int main(int argc, char **argv) {
 
         delete client;
     } else {
-      std::cerr << "Could not create an XMPP client instance!" << std::endl;
+        std::cerr << "Could not create an XMPP client instance!" << std::endl;
     }
 
     if (af)
