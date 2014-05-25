@@ -2,6 +2,16 @@ project(i3c_cli)
 
 cmake_minimum_required(VERSION 2.8)
 
+# Check for C++11 standard
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+
+if(COMPILER_SUPPORTS_CXX11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DCOMPILER_SUPPORTS_CXX11")
+else()
+  message(ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 file(GLOB client_sources "${CMAKE_CURRENT_SOURCE_DIR}/../space_control/*.cpp")
 file(GLOB i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/*.cpp")
 list(REMOVE_ITEM i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/main.cpp")
