@@ -28,7 +28,6 @@
 #include <gloox/message.h>
 #include <gloox/messagesession.h>
 #include <gloox/messagehandler.h>
-#include <gloox/messagesessionhandler.h>
 
 #include "accessfilter.h"
 
@@ -205,7 +204,7 @@ public:
      * \param cmd Pointer to the space command, must not be null
      * \returns The serialized message as String
      */
-    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) = 0;
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) const = 0;
 
     //! De-Serialize a received Space Command
     /*!
@@ -224,7 +223,7 @@ public:
 
     virtual ~TextSpaceCommandSerializer();
 
-    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId);
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) const;
 
     virtual Incoming to_command(const std::string body)
     throw(SpaceCommandFormatException);
@@ -249,14 +248,7 @@ public:
      *  Ideally we would use the XMPP thread ID which, however, as proven to be unreliable.
      * @return The thread ID
      */
-    virtual std::string threadId() const throw() = 0;    
-    
-    //! Set the thread ID.
-    /*!
-     * Set the thread ID to be sent with the messages.
-     * @param _id the new thread ID.
-     */
-    virtual void set_threadId(const std::string _id) throw() = 0;
+    virtual const std::string& threadId() const throw() = 0;    
 };
 
 
@@ -322,7 +314,7 @@ private:
  * An XMPP client, that listens for XMPP messages, converts them to
  * Space Commands and deals with the Space Command handler.
  */
-class SpaceControlClient : public gloox::MessageSessionHandler, gloox::MessageHandler {
+class SpaceControlClient : public gloox::MessageHandler {
 public:
     //! Create the space control client
     /*!
@@ -331,12 +323,6 @@ public:
      * \param _ser the space command serializer
      */
     SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser, AccessFilter* _access);
-
-    //! message session handler
-    /*!
-     * \sa gloox::MessageSessionHandler::handleMessageSession
-     */
-    virtual void handleMessageSession(gloox::MessageSession* session);
 
     //! message handler
     /*!
@@ -363,7 +349,7 @@ public:
      * \param peer The communication peer for the session.
      * \returns a space command sink with a new session.
      */
-    SpaceCommandSink* create_sink(gloox::JID peer);
+    SpaceCommandSink* create_sink(const gloox::JID& peer, const std::string& threadId);
     
     const AccessFilter* access() const throw();
 
