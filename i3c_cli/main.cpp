@@ -75,10 +75,14 @@ public:
     virtual ~I3CExceptionHandler() throw() {}
 
     virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-        // TODO evaluate result
+        // print the exception
 
+        std::cerr << "Exception: " << std::endl;
 
-        std::cout << "Disconnect." << std::endl;
+        for (xmppsc::SpaceCommand::space_command_params::const_iterator it = sc.params().cbegin();
+                it != sc.params().cend(); it++)
+            std::cerr << it->first << ": " << it->second << std::endl;
+
         return true;
     }
 };
@@ -92,15 +96,15 @@ public:
     virtual ~I3CTimeoutHandler() throw() {}
 
     virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-        // TODO evaluate result
+        // print timeout error message
 
+        std::cerr << "TTL-Timeout on I2C sending, something went wrong with bus, message or processing on the device!" << std::endl;
 
-        std::cout << "Disconnect." << std::endl;
         return true;
     }
 };
 
-//TODO exception handling
+//TODO exception handling (denied)
 
 int main(int argc, char **argv) {
     //TODO evaluate CLI arguments
@@ -126,8 +130,8 @@ int main(int argc, char **argv) {
     if (client) {
         xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
         mh->add_method(new I3CResponseMethod(client));
-	mh->add_method(new I3CExceptionHandler(client));
-	mh->add_method(new I3CTimeoutHandler(client));
+        mh->add_method(new I3CExceptionHandler(client));
+        mh->add_method(new I3CTimeoutHandler(client));
 
 
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, mh,
