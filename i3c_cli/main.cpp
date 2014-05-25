@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <chrono>
 
 #include <unistd.h>
 
@@ -20,6 +21,14 @@ void run_client(gloox::Client* client) {
 }
 
 int main(int argc, char **argv) {
+    //TODO evaluate CLI arguments
+
+    const std::string peer("i2c@platon");
+    const std::string i3c_device("0x22");
+    const std::string i3c_command("0x1");
+    const std::string i3c_data("0x5");
+
+    // Client configuration
     gloox::Client* client=0;
     xmppsc::AccessFilter* af=0;
     try {
@@ -31,40 +40,45 @@ int main(int argc, char **argv) {
         return (-1);
     }
 
-    xmppsc::MethodHandler* i2ch = new xmppsc::MethodHandler();
+    xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
 
     if (client) {
-        xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
+        xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, mh,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
         // connect
         std::thread client_thread(run_client, client);
 
+        // wait for client to be connected
         while (client->state() != gloox::ConnectionState::StateConnected)
-            sleep(1);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::cout << "Connected." << std::endl;
 
-	std::cout << "Connected." << std::endl;
 
+        // Send the I3C command
         xmppsc::SpaceCommand::space_command_params parms;
-        parms["device"] = "0x22";
-        parms["command"] = "0x1";
-        parms["data"] = "0x5";
+        parms["device"] = i3c_device;
+        parms["command"] = i3c_command;
+        parms["data"] = i3c_data;
         const xmppsc::SpaceCommand sc("i3c.call", parms);
 
-        xmppsc::SpaceCommandSink* sink = scc->create_sink(gloox::JID("i2c@platon"), "cli_thread");
+        xmppsc::SpaceCommandSink* sink = scc->create_sink(gloox::JID(peer), "cli_thread");
 
         sink->sendSpaceCommand(sc);
 
-        // wait for response
+        // TODO wait for response
         sleep(1);
 
         delete sink;
 
-        std::cout << "Disconnecct." << std::endl;
+        // go on in client thread (response arrives here)
+        client_thread.join();
+
+        // cleanup
+        std::cout << "Disconnect." << std::endl;
         client->disconnect();
 
-        // wait for client thread
-        client_thread.join();
 
         delete client;
     }
