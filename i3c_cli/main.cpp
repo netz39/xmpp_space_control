@@ -123,12 +123,20 @@ public:
 };
 
 int main(int argc, char **argv) {
-    //TODO evaluate CLI arguments
+    //evaluate CLI arguments
+    // progname <peer> <device> <command> [data]
+    if (argc < 4) {
+	std::cout << "Usage:" << std::endl;
+	std::cout << "\ti3c_cli <XMPP peer> <device> <command> [data]" << std::endl << std::endl;
+	std::cout << "Device, command and data expect hex values!" << std::endl;
+        return -1;
+    }
 
-    const std::string peer("i2c@platon");
-    const std::string i3c_device("0x22");
-    const std::string i3c_command("0x1");
-    const std::string i3c_data("0x5");
+    const std::string peer(argv[1]);
+    const std::string i3c_device(argv[2]);
+    const std::string i3c_command(argv[3]);
+    const std::string i3c_data(argc > 4 ? argv[4] : "");
+
 
     // Client configuration
     gloox::Client* client=0;
@@ -161,7 +169,8 @@ int main(int argc, char **argv) {
         xmppsc::SpaceCommand::space_command_params parms;
         parms["device"] = i3c_device;
         parms["command"] = i3c_command;
-        parms["data"] = i3c_data;
+        if (! i3c_data.empty())
+            parms["data"] = i3c_data;
         const xmppsc::SpaceCommand sc("i3c.call", parms);
 
         std::stringstream threadId("");
