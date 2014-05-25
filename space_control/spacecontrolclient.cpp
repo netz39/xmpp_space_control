@@ -129,7 +129,7 @@ TextSpaceCommandSerializer::TextSpaceCommandSerializer() {}
 
 TextSpaceCommandSerializer::~TextSpaceCommandSerializer() {}
 
-std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd, const std::string& threadId) {
+std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd, const std::string& threadId) const {
 
     // build parameter list
     std::stringstream pars("");
@@ -242,42 +242,33 @@ throw(SpaceCommandFormatException) {
 // local helper class
 class Sink : public SpaceCommandSink {
 public:
-    Sink(gloox::MessageSession* _session, SpaceCommandSerializer* _ser, bool _shared=false)
-        : m_session(_session), m_ser(_ser), m_shared(_shared) {}
-    virtual ~Sink();
+    //TODO null ptr exception
+    Sink(const std::string& threadId, const gloox::JID peer, gloox::Client* client, const SpaceCommandSerializer* ser)
+        : m_threadId(threadId), m_peer(peer), m_client(client), m_ser(ser) {}
+    virtual ~Sink() {}
 
     virtual void sendSpaceCommand(const SpaceCommand& sc);
 
-    //TODO documentation
-    virtual std::string threadId() const throw();
-    virtual void set_threadId(const std::string _id) throw();
+    virtual const std::string& threadId() const throw();
 
 private:
-    SpaceCommandSerializer* m_ser;
-    gloox::MessageSession* m_session;
-    bool m_shared;
+    const std::string m_threadId;
+    const gloox::JID m_peer;
+    gloox::Client* m_client;
+    const SpaceCommandSerializer* m_ser;
 };
 
-Sink::~Sink() {
-    if (!m_shared && m_session)
-        delete m_session;
-}
-
 void Sink::sendSpaceCommand(const SpaceCommand& sc) {
-    if (m_session) {
-        m_session->send(m_ser->to_body(sc, threadId()));
-    }
-    //TODO else
+    std::string body(m_ser->to_body(sc, m_threadId));
+    gloox::Message m(gloox::Message::Chat, m_peer, body);
+
+    m_client->send(m);
 }
 
-std::string Sink::threadId() const throw() {
-    return m_session ? m_session->threadID() : "";
+const std::string& Sink::threadId() const throw() {
+    return m_threadId;
 }
 
-void Sink::set_threadId(const std::string _id) throw() {
-    if (m_session)
-        m_session->setThreadID(_id);
-}
 
 
 
@@ -318,13 +309,12 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             // may throw a SpaceCommandFormatException
             const SpaceCommandSerializer::Incoming in = serializer()->to_command(msg.body());
             const std::string threadId(in.first);
-	    const SpaceCommand cmd = in.second;
+            const SpaceCommand cmd = in.second;
 
             // check for access
             if (m_access ? m_access->accepted(msg.from()) : true) {
                 // create shared sink
-                Sink sink(session, m_ser, true);
-                sink.set_threadId(threadId);
+                Sink sink(threadId, msg.from(), m_client, m_ser);
 
                 // call handler
                 if (m_hnd)
@@ -376,8 +366,12 @@ SpaceCommandSerializer* SpaceControlClient::serializer() {
 SpaceCommandSink* SpaceControlClient::create_sink(gloox::JID peer) {
     gloox::MessageSession* session = new gloox::MessageSession(this->m_client, peer);
 
+    //TODO thread ID
+    const std::string threadId("testId");
+
     // return sink that is not shared
-    return new Sink(session, m_ser, false);
+    return new Sink(threadId, peer, m_client, m_ser);
+
 }
 
 const AccessFilter* SpaceControlClient::access() const throw()

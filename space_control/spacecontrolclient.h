@@ -205,7 +205,7 @@ public:
      * \param cmd Pointer to the space command, must not be null
      * \returns The serialized message as String
      */
-    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) = 0;
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) const = 0;
 
     //! De-Serialize a received Space Command
     /*!
@@ -224,7 +224,7 @@ public:
 
     virtual ~TextSpaceCommandSerializer();
 
-    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId);
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) const;
 
     virtual Incoming to_command(const std::string body)
     throw(SpaceCommandFormatException);
@@ -249,14 +249,7 @@ public:
      *  Ideally we would use the XMPP thread ID which, however, as proven to be unreliable.
      * @return The thread ID
      */
-    virtual std::string threadId() const throw() = 0;    
-    
-    //! Set the thread ID.
-    /*!
-     * Set the thread ID to be sent with the messages.
-     * @param _id the new thread ID.
-     */
-    virtual void set_threadId(const std::string _id) throw() = 0;
+    virtual const std::string& threadId() const throw() = 0;    
 };
 
 
