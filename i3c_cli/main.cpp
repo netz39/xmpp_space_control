@@ -26,6 +26,26 @@ void wait_for_state(const gloox::Client* client, const gloox::ConnectionState& s
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
+class I3CResponseMethod : public xmppsc::CommandMethod {
+public:
+    I3CResponseMethod(gloox::Client* _client) throw()
+        : CommandMethod("i3c.response"), m_client(_client) {}
+    virtual ~I3CResponseMethod() throw() {}
+
+    virtual void handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
+        // TODO evaluate result
+
+        std::cout << "Disconnect." << std::endl;
+        m_client->disconnect();
+        wait_for_state(m_client, gloox::ConnectionState::StateDisconnected);
+
+    }
+private:
+    gloox::Client* m_client;
+};
+
+
+
 int main(int argc, char **argv) {
     //TODO evaluate CLI arguments
 
@@ -46,9 +66,12 @@ int main(int argc, char **argv) {
         return (-1);
     }
 
-    xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
 
     if (client) {
+        xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
+        mh->add_method(new I3CResponseMethod(client));
+
+
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, mh,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
@@ -69,18 +92,11 @@ int main(int argc, char **argv) {
 
         sink->sendSpaceCommand(sc);
 
-        // TODO wait for response
-        sleep(1);
-
-        delete sink;
-
         // go on in client thread (response arrives here)
         client_thread.join();
 
         // cleanup
-        std::cout << "Disconnect." << std::endl;
-        client->disconnect();
-	wait_for_state(client, gloox::ConnectionState::StateDisconnected);
+        delete sink;
 
 
         delete client;
