@@ -129,7 +129,7 @@ TextSpaceCommandSerializer::TextSpaceCommandSerializer() {}
 
 TextSpaceCommandSerializer::~TextSpaceCommandSerializer() {}
 
-std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd) {
+std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd, const std::string& threadId) {
 
     // build parameter list
     std::stringstream pars("");
@@ -161,17 +161,20 @@ std::string TextSpaceCommandSerializer::to_body(const SpaceCommand& cmd) {
 
     // build message body
     std::stringstream body;
-    body << cmd.cmd();
+    body << cmd.cmd() << std::endl;
+    body << threadId;
     if (!pars.str().empty())
         body << std::endl << pars.str();
 
     return body.str();
 }
 
-SpaceCommand TextSpaceCommandSerializer::to_command(const std::string body)
+TextSpaceCommandSerializer::Incoming TextSpaceCommandSerializer::to_command(const std::string body)
 throw(SpaceCommandFormatException) {
     // the command
     std::string command;
+    // the thread Id
+    std::string threadId;
     // the parameter map
     SpaceCommand::space_command_params params;
 
@@ -183,8 +186,11 @@ throw(SpaceCommandFormatException) {
         line_number++;
 
         // first line is command
-        if (command.empty())
+        if (line_number == 1)
             command = line;
+        // second line is the thread Id
+        else if (line_number == 2)
+            threadId = line;
         else {
             /* Note: std::stoi is not available yet :(
              *
@@ -229,7 +235,7 @@ throw(SpaceCommandFormatException) {
     }
 
     // create the command
-    return SpaceCommand(command, params);
+    return Incoming(threadId, SpaceCommand(command, params));
 }
 
 
@@ -241,6 +247,10 @@ public:
     virtual ~Sink();
 
     virtual void sendSpaceCommand(const SpaceCommand& sc);
+
+    //TODO documentation
+    virtual std::string threadId() const throw();
+    virtual void set_threadId(const std::string _id) throw();
 
 private:
     SpaceCommandSerializer* m_ser;
@@ -255,10 +265,20 @@ Sink::~Sink() {
 
 void Sink::sendSpaceCommand(const SpaceCommand& sc) {
     if (m_session) {
-        m_session->send(m_ser->to_body(sc));
+        m_session->send(m_ser->to_body(sc, threadId()));
     }
     //TODO else
 }
+
+std::string Sink::threadId() const throw() {
+    return m_session ? m_session->threadID() : "";
+}
+
+void Sink::set_threadId(const std::string _id) throw() {
+    if (m_session)
+        m_session->setThreadID(_id);
+}
+
 
 
 CommandMethod::CommandMethod(CommandMethod::t_command_set _commands)
@@ -296,12 +316,15 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
         try {
             // create the command
             // may throw a SpaceCommandFormatException
-            const SpaceCommand cmd = serializer()->to_command(msg.body());
+            const SpaceCommandSerializer::Incoming in = serializer()->to_command(msg.body());
+            const std::string threadId(in.first);
+	    const SpaceCommand cmd = in.second;
 
             // check for access
-	    if (m_access ? m_access->accepted(msg.from()) : true) {
+            if (m_access ? m_access->accepted(msg.from()) : true) {
                 // create shared sink
                 Sink sink(session, m_ser, true);
+                sink.set_threadId(threadId);
 
                 // call handler
                 if (m_hnd)
@@ -309,9 +332,9 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             } else {
                 // send access denied message
                 SpaceCommand::space_command_params par;
-		par["reason"] = "Denied by access filter!";
+                par["reason"] = "Denied by access filter!";
                 SpaceCommand ex("denied", par);
-                session->send(serializer()->to_body(ex));
+                session->send(serializer()->to_body(ex, threadId));
             }
         } catch (SpaceCommandFormatException& scfe) {
             SpaceCommand::space_command_params par;
@@ -332,7 +355,7 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
 
             SpaceCommand ex("exception", par);
 
-            session->send(serializer()->to_body(ex));
+            session->send(serializer()->to_body(ex, session->threadID()));
         }
     //TODO else warn
 }

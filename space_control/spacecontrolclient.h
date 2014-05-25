@@ -196,6 +196,8 @@ private:
 //! Interface to a Space Command serializer
 class SpaceCommandSerializer {
 public:
+    typedef std::pair<std::string, SpaceCommand> Incoming;
+  
     virtual ~SpaceCommandSerializer() = 0;
 
     //! Serialize a Space Command for sending
@@ -203,7 +205,7 @@ public:
      * \param cmd Pointer to the space command, must not be null
      * \returns The serialized message as String
      */
-    virtual std::string to_body(const SpaceCommand& cmd) = 0;
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId) = 0;
 
     //! De-Serialize a received Space Command
     /*!
@@ -211,7 +213,7 @@ public:
      * \returns pointer to the created command
      * \throws SpaceCommandFormatException if the body cannot be de-serialized
      */
-    virtual SpaceCommand to_command(const std::string body)
+    virtual Incoming to_command(const std::string body)
     throw(SpaceCommandFormatException) = 0;
 };
 
@@ -222,9 +224,9 @@ public:
 
     virtual ~TextSpaceCommandSerializer();
 
-    virtual std::string to_body(const SpaceCommand& cmd);
+    virtual std::string to_body(const SpaceCommand& cmd, const std::string& threadId);
 
-    virtual SpaceCommand to_command(const std::string body)
+    virtual Incoming to_command(const std::string body)
     throw(SpaceCommandFormatException);
 };
 
@@ -241,6 +243,10 @@ public:
      * \param sc The space command to be sent.
      */
     virtual void sendSpaceCommand(const SpaceCommand& sc) = 0;
+
+    //TODO documentation
+    virtual std::string threadId() const throw() = 0;    
+    virtual void set_threadId(const std::string _id) throw() = 0;
 };
 
 
