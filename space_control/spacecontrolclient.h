@@ -244,8 +244,18 @@ public:
      */
     virtual void sendSpaceCommand(const SpaceCommand& sc) = 0;
 
-    //TODO documentation
+    //! Return the communication thread ID.
+    /*!
+     *  Ideally we would use the XMPP thread ID which, however, as proven to be unreliable.
+     * @return The thread ID
+     */
     virtual std::string threadId() const throw() = 0;    
+    
+    //! Set the thread ID.
+    /*!
+     * Set the thread ID to be sent with the messages.
+     * @param _id the new thread ID.
+     */
     virtual void set_threadId(const std::string _id) throw() = 0;
 };
 

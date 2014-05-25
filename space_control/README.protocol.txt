@@ -6,6 +6,7 @@ Die aktuelle Implementierung verwendet Text-Nachrichten zur Kommunikation. Bisla
 Eine Nachricht hat immer folgendes Format:
 
 <Command>
+<Thread ID>
 <N> <parameter name>
 <N Zeilen parameter value>
 <N> <parameter name>
@@ -14,6 +15,7 @@ Eine Nachricht hat immer folgendes Format:
 
 Beispiel:
 ic2.read16
+xmpp:tux@n39.eu/psi:1
 1 device
 0x22
 1 register
@@ -22,6 +24,7 @@ ic2.read16
 
 Beispiel 2:
 helloworld
+xmpp:tux@n39.eu/psi:2
 1 subject
 hallo welt!
 3 body
@@ -34,3 +37,8 @@ Zeilenumbrüche!
 Die Commands werden durch die jeweiligen Applikationen festgelegt. Dabei sind bislang folgende Prefixe vergeben:
 
 i2c.	I2C-Anbindung
+i3c.	I3C-Client
+
+Die Thread-ID wird verwendet, um zusammengehörende Nachrichten zu erkennen. 
+Dazu gibt es eigentlich die XMPP Thread ID, die sich aber über die Bibliotheken 
+und Implementierungen hinweg als unzuverlässig herausgestellt hat.
