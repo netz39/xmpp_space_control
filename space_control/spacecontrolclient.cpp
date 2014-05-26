@@ -323,7 +323,7 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
             SpaceCommand ex("denied", par);
             sink.sendSpaceCommand(ex);
         }
-    } catch (SpaceCommandFormatException& scfe) {
+    } catch (const SpaceCommandFormatException& scfe) {
         SpaceCommand::space_command_params par;
         par["what"] = scfe.what();
         par["body"] = scfe.body();
@@ -343,7 +343,7 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
         SpaceCommand ex("exception", par);
 
         m_client->send(gloox::Message(gloox::Message::Normal, msg.from(),
-                                      serializer()->to_body(ex, session->threadID())));
+                                      serializer()->to_body(ex, "")));
     }
 }
 
