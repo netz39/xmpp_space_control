@@ -126,9 +126,9 @@ int main(int argc, char **argv) {
     //evaluate CLI arguments
     // progname <peer> <device> <command> [data]
     if (argc < 4) {
-	std::cout << "Usage:" << std::endl;
-	std::cout << "\ti3c_cli <XMPP peer> <device> <command> [data]" << std::endl << std::endl;
-	std::cout << "Device, command and data expect hex values!" << std::endl;
+        std::cout << "Usage:" << std::endl;
+        std::cout << "\ti3c_cli <XMPP peer> <device> <command> [data]" << std::endl << std::endl;
+        std::cout << "Device, command and data expect hex values!" << std::endl;
         return -1;
     }
 
@@ -136,6 +136,7 @@ int main(int argc, char **argv) {
     const std::string i3c_device(argv[2]);
     const std::string i3c_command(argv[3]);
     const std::string i3c_data(argc > 4 ? argv[4] : "");
+
 
 
     // Client configuration
@@ -150,8 +151,10 @@ int main(int argc, char **argv) {
         return (-1);
     }
 
-
     if (client) {
+	// Use the "eco" variant
+        xmppsc::set_eco_tcp_client(client);
+
         xmppsc::MethodHandler* mh = new xmppsc::MethodHandler();
         mh->add_method(new I3CResponseMethod(client));
         mh->add_method(new I3CExceptionHandler(client));
