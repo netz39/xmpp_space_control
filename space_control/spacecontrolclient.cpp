@@ -384,6 +384,17 @@ EcoConnectionTCPClient::EcoConnectionTCPClient(gloox::ConnectionDataHandler* cdh
     : ConnectionTCPClient(cdh, logInstance, server, port)
 {}
 
+gloox::ConnectionError EcoConnectionTCPClient::receive()
+{
+    if( m_socket < 0 )
+        return gloox::ConnNotConnected;
+
+    gloox::ConnectionError err = gloox::ConnNoError;
+    while( !m_cancel && ( err = recv( 1000000 ) ) == gloox::ConnNoError )
+        ;
+    return err == gloox::ConnNoError ? gloox::ConnNotConnected : err;
+}
+
 
 } // namespace xmppsc
 

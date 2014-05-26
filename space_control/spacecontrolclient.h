@@ -375,6 +375,8 @@ class EcoConnectionTCPClient : public gloox::ConnectionTCPClient {
 public:
     EcoConnectionTCPClient(gloox::ConnectionDataHandler* cdh, const gloox::LogSink& logInstance,
                            const std::string& server, int port);
+    
+    virtual gloox::ConnectionError receive();
 };
 
 }
