@@ -371,6 +371,31 @@ const AccessFilter* SpaceControlClient::access() const throw()
 }
 
 
+
+void set_eco_tcp_client(gloox::Client* client) {
+    EcoConnectionTCPClient* ecocon =
+        new EcoConnectionTCPClient(client, client->logInstance(), client->server(), client->port());
+
+    client->setConnectionImpl(ecocon);
+}
+
+EcoConnectionTCPClient::EcoConnectionTCPClient(gloox::ConnectionDataHandler* cdh, const gloox::LogSink& logInstance,
+        const std::string& server, int port)
+    : ConnectionTCPClient(cdh, logInstance, server, port)
+{}
+
+gloox::ConnectionError EcoConnectionTCPClient::receive()
+{
+    if( m_socket < 0 )
+        return gloox::ConnNotConnected;
+
+    gloox::ConnectionError err = gloox::ConnNoError;
+    while( !m_cancel && ( err = recv( 1000000 ) ) == gloox::ConnNoError )
+        ;
+    return err == gloox::ConnNoError ? gloox::ConnNotConnected : err;
+}
+
+
 } // namespace xmppsc
 
 // End of File

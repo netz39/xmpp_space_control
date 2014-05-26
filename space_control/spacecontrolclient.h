@@ -28,6 +28,7 @@
 #include <gloox/message.h>
 #include <gloox/messagesession.h>
 #include <gloox/messagehandler.h>
+#include <gloox/connectiontcpclient.h>
 
 #include "accessfilter.h"
 
@@ -101,8 +102,8 @@ public:
 
 private:
     std::string m_name;
-    /* 
-     * The message for what() is functional dependent on m_name, 
+    /*
+     * The message for what() is functional dependent on m_name,
      * but must be stored here due to scope issues. Assembly is
      * done in the constructor.
      */
@@ -133,8 +134,8 @@ public:
 private:
     std::string m_name;
     std::string m_reason;
-    /* 
-     * The message for what() is functional dependent on m_name, 
+    /*
+     * The message for what() is functional dependent on m_name,
      * but must be stored here due to scope issues. Assembly is
      * done in the constructor.
      */
@@ -146,7 +147,7 @@ private:
 /*!
  * This class represents a Space Command, consisting of the issuing/receiving
  * peer, the command name and the parameter map.
- * 
+ *
  * This class is immutable.
  */
 class SpaceCommand {
@@ -160,7 +161,7 @@ public:
      * \param _params The parameter map.
      */
     SpaceCommand(const std::string& _cmd, const space_command_params& _params) throw();
-    
+
     //! Copy constructor.
     SpaceCommand(const SpaceCommand& other);
 
@@ -177,8 +178,8 @@ public:
      * \throws MissingCommandParameterException if the parameter does not exist.
      */
     const std::string& param(const std::string& key) const
-      throw(MissingCommandParameterException);
-      
+    throw(MissingCommandParameterException);
+
     bool param_available(const std::string& key) const;
 
     //! Direct access to the parameter map.
@@ -196,7 +197,7 @@ private:
 class SpaceCommandSerializer {
 public:
     typedef std::pair<std::string, SpaceCommand> Incoming;
-  
+
     virtual ~SpaceCommandSerializer() = 0;
 
     //! Serialize a Space Command for sending
@@ -248,7 +249,7 @@ public:
      *  Ideally we would use the XMPP thread ID which, however, as proven to be unreliable.
      * @return The thread ID
      */
-    virtual const std::string& threadId() const throw() = 0;    
+    virtual const std::string& threadId() const throw() = 0;
 };
 
 
@@ -289,7 +290,7 @@ public:
      * \param _command the command understood by this method
      */
     CommandMethod(const std::string _command);
-    
+
     virtual ~CommandMethod() throw();
 
     //! Get the command set.
@@ -350,7 +351,7 @@ public:
      * \returns a space command sink with a new session.
      */
     SpaceCommandSink* create_sink(const gloox::JID& peer, const std::string& threadId);
-    
+
     const AccessFilter* access() const throw();
 
 protected:
@@ -365,6 +366,17 @@ private:
     SpaceControlHandler* m_hnd;
     SpaceCommandSerializer* m_ser;
     AccessFilter* m_access;
+};
+
+
+void set_eco_tcp_client(gloox::Client* client);
+
+class EcoConnectionTCPClient : public gloox::ConnectionTCPClient {
+public:
+    EcoConnectionTCPClient(gloox::ConnectionDataHandler* cdh, const gloox::LogSink& logInstance,
+                           const std::string& server, int port);
+    
+    virtual gloox::ConnectionError receive();
 };
 
 }
