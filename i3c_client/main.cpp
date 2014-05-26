@@ -40,6 +40,9 @@ int main(int argc, char **argv) {
 
 
     if (client) {
+        // Use the "eco" variant
+        xmppsc::set_eco_tcp_client(client);
+
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
