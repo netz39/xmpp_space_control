@@ -371,6 +371,20 @@ const AccessFilter* SpaceControlClient::access() const throw()
 }
 
 
+
+void set_eco_tcp_client(gloox::Client* client) {
+    EcoConnectionTCPClient* ecocon =
+        new EcoConnectionTCPClient(client, client->logInstance(), client->server(), client->port());
+
+    client->setConnectionImpl(ecocon);
+}
+
+EcoConnectionTCPClient::EcoConnectionTCPClient(gloox::ConnectionDataHandler* cdh, const gloox::LogSink& logInstance,
+        const std::string& server, int port)
+    : ConnectionTCPClient(cdh, logInstance, server, port)
+{}
+
+
 } // namespace xmppsc
 
 // End of File
