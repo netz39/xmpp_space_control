@@ -146,11 +146,6 @@ void Daemon::message(const int level, const char *msg, ...)
     va_end(argp);
 }
 
-void Daemon::pause()
-{
-    usleep(100 * 1000);
-}
-
 bool Daemon::sighup()
 {
     return hup_received;

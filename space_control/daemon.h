@@ -20,9 +20,6 @@ public:
 
     void message(const int level, const char *msg, ...);
 
-    /// Pause for 100ms
-    void pause();
-
     /// SigHUP received?
     bool sighup();
 
