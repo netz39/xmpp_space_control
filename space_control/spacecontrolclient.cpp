@@ -119,6 +119,11 @@ throw(MissingCommandParameterException) {
     return it->second;
 }
 
+bool SpaceCommand::param_available(const std::string& key) const throw() {
+  return m_params.find(key) != m_params.end();
+}
+
+
 const SpaceCommand::space_command_params& SpaceCommand::params() const throw() {
     return m_params;
 }
