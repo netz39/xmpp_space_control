@@ -101,6 +101,10 @@ bool Daemon::seed()
 
 bool Daemon::store_pid()
 {
+    // store pid file only if a path is set, otherwise we are automatically successful
+    if (m_pid_path == "")
+      return true;
+    
     if((m_lock = open(m_pid_path.c_str(), O_RDWR | O_CREAT, 0644)) == -1) {
         message(LOG_ERR, "Failed to open the PID file.");
         // TODO rather an exception
