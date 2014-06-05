@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <popt.h>
 
 #include <iostream>
 
@@ -12,8 +13,59 @@
 #include "i3cmethods.h"
 #include "i2cendpoint.h"
 
+class Options {
+public:
+    Options() : foreground(false), pid_file("") {}
 
-int main(int argc, char **argv) {
+    bool read_options(int argc, const char* argv[]);
+
+    bool foreground;
+    std::string pid_file;
+};
+
+bool Options::read_options(int argc, const char* argv[]) {
+    char* _pid_file=0;
+
+    struct poptOption optionsTable[] = {
+        {"foreground", 0, POPT_ARG_NONE | POPT_ARGFLAG_OPTIONAL , 0, 'd', "Run in foreground, not as daemon", NULL},
+        {"pidfile", 'p', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, &_pid_file, 0, "PID file", "path to PID file"},
+	POPT_AUTOHELP
+	{ NULL, 0, 0, NULL, 0 }
+    };
+    poptContext optCon = poptGetContext(argv[0], argc, argv, optionsTable, 0);
+
+    // opt processing
+    char c;
+    while ((c = poptGetNextOpt(optCon)) >= 0) {
+        switch (c) {
+        case 'd':
+            this->foreground = true;
+            break;
+        }
+    }
+
+
+    if (c < -1) {
+        // an error occurred during option processing
+        std::cerr << poptBadOption(optCon, POPT_BADOPTION_NOALIAS) << ": " << poptStrerror(c) << std::endl;
+        return false;
+    }
+
+    // Extract the PID file
+    this->pid_file = std::string(_pid_file ? _pid_file : "/var/run/i3c_client");
+
+    return true;
+}
+
+
+int main(int argc, const char* argv[]) {
+    Options opt;
+    if (!opt.read_options(argc, argv)) {
+        std::cerr << "Error parsing command line options!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+
     xmppsc::Daemon daemon("I3Cclient");
     if (!daemon.seed()) {
       std::cerr << "Daemon already running!" << std::endl;
