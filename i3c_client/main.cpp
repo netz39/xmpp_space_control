@@ -1,8 +1,11 @@
+#include <stdlib.h>
+
 #include <iostream>
 
 #include "../space_control/configuredclientfactory.h"
 #include "../space_control/spacecontrolclient.h"
 #include "../space_control/methodhandler.h"
+#include "../space_control/daemon.h"
 
 
 #include "i2cmethods.h"
@@ -11,6 +14,12 @@
 
 
 int main(int argc, char **argv) {
+    xmppsc::Daemon daemon("I3Cclient");
+    if (!daemon.seed()) {
+      std::cerr << "Daemon already running!" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  
     xmppsc::I2CEndpointBroker*  broker = new xmppsc::I2CEndpointBroker();
 
     //xmppsc::I2CEndpoint* ep = broker->endpoint(0x22);
