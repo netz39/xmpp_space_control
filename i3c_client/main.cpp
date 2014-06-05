@@ -66,12 +66,15 @@ int main(int argc, const char* argv[]) {
     }
 
 
-    xmppsc::Daemon daemon("I3Cclient");
-    if (!daemon.seed()) {
-      std::cerr << "Daemon already running!" << std::endl;
-      exit(EXIT_FAILURE);
+    xmppsc::Daemon daemon("I3Cclient", opt.foreground ? "" : opt.pid_file);
+    // only seed if foreground option is not set
+    if (opt.foreground)
+        std::cout << "Running in foreground mode." << std::endl;
+    else if (!daemon.seed()) {
+        std::cerr << "Daemon already running!" << std::endl;
+        exit(EXIT_FAILURE);
     }
-  
+
     xmppsc::I2CEndpointBroker*  broker = new xmppsc::I2CEndpointBroker();
 
     //xmppsc::I2CEndpoint* ep = broker->endpoint(0x22);
