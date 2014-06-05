@@ -180,7 +180,12 @@ public:
     const std::string& param(const std::string& key) const
     throw(MissingCommandParameterException);
 
-    bool param_available(const std::string& key) const;
+    //! Check if a parameter is available
+    /*!
+     * \param key The parameter name
+     * \returns true, if the parameter is available, otherwise false
+     */
+    bool param_available(const std::string& key) const throw();
 
     //! Direct access to the parameter map.
     /*!
