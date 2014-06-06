@@ -43,32 +43,16 @@ void sig_handler(int signo)
 
 namespace xmppsc {
 
-extern "C" int read_pid()
-{
-    // we are a bit quick and dirty here …
-    std::ifstream is(PID_FILE, std::ios::in);
-    if(!is.is_open()) {
-        return -1;
-    }
-
-    std::stringstream buf("");
-    buf << is.rdbuf();
-
-    const int pid = atoi(buf.str().c_str());
-
-    return pid;
-}
-
 extern "C" int send_sighup(const int pid)
 {
     return kill(pid, SIGHUP);
 }
 
 
-Daemon::Daemon(const char *_name)
-    : m_name(_name), m_lock(0)
+Daemon::Daemon(const std::string& _name, const std::string& pid_path)
+    : m_name(_name), m_pid_path(pid_path), m_lock(0)
 {
-    openlog(m_name, LOG_PID, LOG_USER);
+    openlog(m_name.c_str(), LOG_PID, LOG_USER);
 
     signal(SIGHUP, sig_handler);
     signal(SIGTERM, sig_handler);
@@ -114,9 +98,7 @@ bool Daemon::seed()
 
 bool Daemon::store_pid()
 {
-    const char *lockfile = PID_FILE;
-
-    if((m_lock = open(lockfile, O_RDWR | O_CREAT, 0644)) == -1) {
+    if((m_lock = open(m_pid_path.c_str(), O_RDWR | O_CREAT, 0644)) == -1) {
         message(LOG_ERR, "Failed to open the PID file.");
         // TODO rather an exception
         return false;
@@ -136,6 +118,23 @@ bool Daemon::store_pid()
     return true;
 }
 
+int Daemon::read_pid()
+{
+      // we are a bit quick and dirty here …
+    std::ifstream is(m_pid_path.c_str(), std::ios::in);
+    if(!is.is_open()) {
+        return -1;
+    }
+
+    std::stringstream buf("");
+    buf << is.rdbuf();
+
+    const int pid = atoi(buf.str().c_str());
+
+    return pid;
+}
+
+
 void Daemon::message(const int level, const char *msg, ...)
 {
     va_list argp;
@@ -144,11 +143,6 @@ void Daemon::message(const int level, const char *msg, ...)
     vsyslog(level, msg, argp);
 
     va_end(argp);
-}
-
-void Daemon::pause()
-{
-    usleep(100 * 1000);
 }
 
 bool Daemon::sighup()
