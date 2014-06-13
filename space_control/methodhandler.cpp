@@ -29,7 +29,9 @@ MethodHandler::~MethodHandler() {}
 void MethodHandler::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, SpaceCommandSink* sink) {
     const std::string cmd = sc.cmd();
     try {
+#ifdef DEBUG
         std::cout << "Got command " << cmd << " from " << peer.full() << std::endl;
+#endif
 
         CommandMethod* method = m_methods.at(cmd);
 
