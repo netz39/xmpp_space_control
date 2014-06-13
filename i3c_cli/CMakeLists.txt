@@ -43,6 +43,9 @@ target_link_libraries(i3c_cli ${GLOOX_LIBRARY})
 find_library(CONFIG_LIBRARY config++)
 target_link_libraries(i3c_cli ${CONFIG_LIBRARY})
 
+find_library(XMPPSC_LIBRARY xmppsc-client)
+target_link_libraries(i3c_cli ${XMPPSC_LIBRARY})
+
 # if wiringPi has been included
 if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
   # add link targets for the wiringPi libraries

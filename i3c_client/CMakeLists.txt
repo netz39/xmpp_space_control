@@ -33,6 +33,10 @@ target_link_libraries(i3c_client ${CONFIG_LIBRARY})
 find_library(POPT_LIBRARY popt)
 target_link_libraries(i3c_client ${POPT_LIBRARY})
 
+find_library(XMPPSC_LIBRARY xmppsc-client)
+target_link_libraries(i3c_client ${XMPPSC_LIBRARY})
+
+
 # if wiringPi has been included
 if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
   # add link targets for the wiringPi libraries
