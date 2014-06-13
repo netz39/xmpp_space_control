@@ -68,8 +68,11 @@ int main(int argc, const char* argv[]) {
 
     xmppsc::Daemon daemon("I3Cclient", opt.foreground ? "" : opt.pid_file);
     // only seed if foreground option is not set
-    if (opt.foreground)
+    if (opt.foreground) {
+#ifdef DEBUG      
         std::cout << "Running in foreground mode." << std::endl;
+#endif
+    }
     else if (!daemon.seed()) {
         std::cerr << "Daemon already running!" << std::endl;
         exit(EXIT_FAILURE);
@@ -123,3 +126,4 @@ int main(int argc, const char* argv[]) {
 
     return 0;
 }
+
