@@ -68,10 +68,12 @@ void I3CCallMethod::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, 
         while (!result.c[0] && --hops) {
 
             // perfom read
+#ifdef DEBUG
             std::cout << "I3C call with command 0x" << std::hex << command << ", data 0x" << data
                       << " on device 0x" << device << " (TTL " << std::dec << hops << ")." << std::endl;
             std::cout << "Perform I2C read on 16-bit register 0x" << std::hex << (int)send << " of device 0x" << device << "." << std::endl;
-            result.r = ep->read_reg_16(send);
+#endif
+	    result.r = ep->read_reg_16(send);
 
             // check for transmission errors: 2nd byte is inverted 1st byte
             const unsigned char c = ~result.c[0];
