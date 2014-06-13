@@ -19,7 +19,7 @@
 #define I2CMETHODS_H__
 
 #include "i2cendpoint.h"
-#include "../space_control/spacecontrolclient.h"
+#include <xmppsc/spacecontrolclient.h>
 
 namespace xmppsc {
 

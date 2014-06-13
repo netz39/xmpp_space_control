@@ -13,7 +13,6 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -std=c++0x")
 endif()
 
-file(GLOB client_sources "${CMAKE_CURRENT_SOURCE_DIR}/../space_control/*.cpp")
 file(GLOB i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/*.cpp")
 list(REMOVE_ITEM i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/main.cpp")
 list(REMOVE_ITEM i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/i2cendpoint_dummy.cpp")
@@ -42,6 +41,9 @@ target_link_libraries(i3c_cli ${GLOOX_LIBRARY})
 
 find_library(CONFIG_LIBRARY config++)
 target_link_libraries(i3c_cli ${CONFIG_LIBRARY})
+
+find_library(XMPPSC_LIBRARY xmppsc-client)
+target_link_libraries(i3c_cli ${XMPPSC_LIBRARY})
 
 # if wiringPi has been included
 if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")

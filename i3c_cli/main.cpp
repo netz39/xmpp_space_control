@@ -5,9 +5,9 @@
 
 #include <unistd.h>
 
-#include "../space_control/configuredclientfactory.h"
-#include "../space_control/spacecontrolclient.h"
-#include "../space_control/methodhandler.h"
+#include <xmppsc/configuredclientfactory.h>
+#include <xmppsc/spacecontrolclient.h>
+#include <xmppsc/methodhandler.h>
 
 #include "../i3c_client/i2cmethods.h"
 

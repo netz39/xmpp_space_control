@@ -17,12 +17,7 @@ endif(WIRINGPI_LIBRARY)
 
 add_executable(i3c_client main.cpp i2cmethods.cpp 
 				   i2cendpoint.cpp i2cendpoint_${I2C_ENDPOINT_IMPL}.cpp
-				   i3cmethods.cpp
-						  ../space_control/configuredclientfactory.cpp
-                                                  ../space_control/spacecontrolclient.cpp
-                                                  ../space_control/methodhandler.cpp
-                                                  ../space_control/accessfilter.cpp
-                                                  ../space_control/daemon.cpp)
+				   i3cmethods.cpp)
 
 find_library(GLOOX_LIBRARY gloox)
 target_link_libraries(i3c_client ${GLOOX_LIBRARY})
@@ -32,6 +27,10 @@ target_link_libraries(i3c_client ${CONFIG_LIBRARY})
 
 find_library(POPT_LIBRARY popt)
 target_link_libraries(i3c_client ${POPT_LIBRARY})
+
+find_library(XMPPSC_LIBRARY xmppsc-client)
+target_link_libraries(i3c_client ${XMPPSC_LIBRARY})
+
 
 # if wiringPi has been included
 if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
