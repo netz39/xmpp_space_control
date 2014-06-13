@@ -21,13 +21,17 @@ add_executable(i3c_client main.cpp i2cmethods.cpp
 						  ../space_control/configuredclientfactory.cpp
                                                   ../space_control/spacecontrolclient.cpp
                                                   ../space_control/methodhandler.cpp
-                                                  ../space_control/accessfilter.cpp)
+                                                  ../space_control/accessfilter.cpp
+                                                  ../space_control/daemon.cpp)
 
 find_library(GLOOX_LIBRARY gloox)
 target_link_libraries(i3c_client ${GLOOX_LIBRARY})
 
 find_library(CONFIG_LIBRARY config++)
 target_link_libraries(i3c_client ${CONFIG_LIBRARY})
+
+find_library(POPT_LIBRARY popt)
+target_link_libraries(i3c_client ${POPT_LIBRARY})
 
 # if wiringPi has been included
 if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
