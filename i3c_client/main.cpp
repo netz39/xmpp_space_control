@@ -113,10 +113,14 @@ int main(int argc, const char* argv[]) {
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
-        if (!client->connect(true))
-            std::cerr << "could not connect!" << std::endl;
+        while (scc->conn_error() != gloox::ConnUserDisconnected) {
+            if (!client->connect(true))
+                std::cerr << "could not connect!" << std::endl;
 
-	delete scc;
+	    std::cout << scc->conn_error() << std::endl;
+        }
+
+        delete scc;
         delete client;
     }
 
