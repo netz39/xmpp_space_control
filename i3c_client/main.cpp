@@ -116,6 +116,7 @@ int main(int argc, const char* argv[]) {
         if (!client->connect(true))
             std::cerr << "could not connect!" << std::endl;
 
+	delete scc;
         delete client;
     }
 
