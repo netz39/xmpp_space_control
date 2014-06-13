@@ -29,6 +29,7 @@
 #include <gloox/messagesession.h>
 #include <gloox/messagehandler.h>
 #include <gloox/connectiontcpclient.h>
+#include <gloox/connectionlistener.h>
 
 #include "accessfilter.h"
 
@@ -320,7 +321,7 @@ private:
  * An XMPP client, that listens for XMPP messages, converts them to
  * Space Commands and deals with the Space Command handler.
  */
-class SpaceControlClient : public gloox::MessageHandler {
+class SpaceControlClient : public gloox::MessageHandler, gloox::ConnectionListener {
 public:
     //! Create the space control client
     /*!
@@ -329,6 +330,8 @@ public:
      * \param _ser the space command serializer
      */
     SpaceControlClient(gloox::Client* _client, SpaceControlHandler* _hnd, SpaceCommandSerializer* _ser, AccessFilter* _access);
+    
+    virtual ~SpaceControlClient();
 
     //! message handler
     /*!
@@ -337,12 +340,24 @@ public:
      * \sa gloox::MessageHandler::handleMessage
      */
     virtual void handleMessage(const gloox::Message& msg, gloox::MessageSession* session = 0);
+    
+    virtual void onConnect();
+    
+    //! Disconnect handler
+    /*!
+     * Store the disconnection reason
+     */
+    virtual void onDisconnect(gloox::ConnectionError e);
+    
+    virtual bool onTLSConnect(const gloox::CertInfo& info);
 
     //! Get the XMPP client.
     /*!
      * \returns the XMPP client used by this space control client.
      */
     gloox::Client* client();
+    
+    gloox::ConnectionError conn_error() const throw();
 
     //! Get the space control handler.
     /*!
@@ -368,6 +383,7 @@ protected:
 
 private:
     gloox::Client* m_client;
+    gloox::ConnectionError m_conn_error;
     SpaceControlHandler* m_hnd;
     SpaceCommandSerializer* m_ser;
     AccessFilter* m_access;
@@ -387,5 +403,6 @@ public:
 }
 
 #endif // SPACECONTROLCLIENT_H__
+
 
 
