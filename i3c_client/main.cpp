@@ -2,6 +2,8 @@
 #include <popt.h>
 
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include <xmppsc/configuredclientfactory.h>
 #include <xmppsc/spacecontrolclient.h>
@@ -117,7 +119,10 @@ int main(int argc, const char* argv[]) {
             if (!client->connect(true))
                 std::cerr << "could not connect!" << std::endl;
 
-	    std::cout << scc->conn_error() << std::endl;
+            std::cout << scc->conn_error() << std::endl;
+
+            if (scc->conn_error() != gloox::ConnUserDisconnected)
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
         delete scc;
