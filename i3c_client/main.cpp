@@ -29,8 +29,8 @@ bool Options::read_options(int argc, const char* argv[]) {
     struct poptOption optionsTable[] = {
         {"foreground", 0, POPT_ARG_NONE | POPT_ARGFLAG_OPTIONAL , 0, 'd', "Run in foreground, not as daemon", NULL},
         {"pidfile", 'p', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, &_pid_file, 0, "PID file", "path to PID file"},
-	POPT_AUTOHELP
-	{ NULL, 0, 0, NULL, 0 }
+        POPT_AUTOHELP
+        { NULL, 0, 0, NULL, 0 }
     };
     poptContext optCon = poptGetContext(argv[0], argc, argv, optionsTable, 0);
 
@@ -69,7 +69,7 @@ int main(int argc, const char* argv[]) {
     xmppsc::Daemon daemon("I3Cclient", opt.foreground ? "" : opt.pid_file);
     // only seed if foreground option is not set
     if (opt.foreground) {
-#ifdef DEBUG      
+#ifdef DEBUG
         std::cout << "Running in foreground mode." << std::endl;
 #endif
     }

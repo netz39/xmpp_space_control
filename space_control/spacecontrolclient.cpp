@@ -120,7 +120,7 @@ throw(MissingCommandParameterException) {
 }
 
 bool SpaceCommand::param_available(const std::string& key) const throw() {
-  return m_params.find(key) != m_params.end();
+    return m_params.find(key) != m_params.end();
 }
 
 
