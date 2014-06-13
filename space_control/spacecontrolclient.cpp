@@ -299,9 +299,20 @@ SpaceControlClient::SpaceControlClient(gloox::Client* _client,
                                        SpaceCommandSerializer* _ser,
                                        AccessFilter* _access
                                       )
-    : m_client(_client), m_hnd(_hnd), m_ser(_ser), m_access(_access) {
-    if (_client)
+    : m_client(_client), m_conn_error(gloox::ConnNotConnected), 
+      m_hnd(_hnd), m_ser(_ser), m_access(_access) {
+    if (_client) {
         m_client->registerMessageHandler(this);
+	m_client->registerConnectionListener(this);
+    }
+}
+
+SpaceControlClient::~SpaceControlClient()
+{
+  if (m_client) {
+    m_client->removeMessageHandler(this);
+    m_client->removeConnectionListener(this);
+  }
 }
 
 void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::MessageSession* session) {
@@ -352,9 +363,34 @@ void SpaceControlClient::handleMessage(const gloox::Message& msg, gloox::Message
     }
 }
 
+
+void SpaceControlClient::onConnect()
+{
+  m_conn_error = gloox::ConnNoError;
+}
+
+void SpaceControlClient::onDisconnect(gloox::ConnectionError e)
+{
+  // store the connection error
+  m_conn_error = e;
+}
+
+bool SpaceControlClient::onTLSConnect(const gloox::CertInfo& info)
+{
+  // just say yes
+  return true;
+}
+
+
 gloox::Client* SpaceControlClient::client() {
     return this->m_client;
 }
+
+gloox::ConnectionError SpaceControlClient::conn_error() const throw()
+{
+  return m_conn_error;
+}
+
 
 SpaceControlHandler* SpaceControlClient::handler() {
     return this->m_hnd;
