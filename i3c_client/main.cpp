@@ -35,7 +35,7 @@ bool Options::read_options(int argc, const char* argv[]) {
     poptContext optCon = poptGetContext(argv[0], argc, argv, optionsTable, 0);
 
     // opt processing
-    char c;
+    int c;
     while ((c = poptGetNextOpt(optCon)) >= 0) {
         switch (c) {
         case 'd':
