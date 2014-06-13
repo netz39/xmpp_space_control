@@ -3,10 +3,10 @@
 
 #include <iostream>
 
-#include "../space_control/configuredclientfactory.h"
-#include "../space_control/spacecontrolclient.h"
-#include "../space_control/methodhandler.h"
-#include "../space_control/daemon.h"
+#include <xmppsc/configuredclientfactory.h>
+#include <xmppsc/spacecontrolclient.h>
+#include <xmppsc/methodhandler.h>
+#include <xmppsc/daemon.h>
 
 
 #include "i2cmethods.h"
