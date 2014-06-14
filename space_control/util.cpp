@@ -18,6 +18,24 @@
 #include <sstream>
 #include <iomanip>
 
+namespace {
+  
+//! Calculate the (even) hex width of a number
+/*!
+ * i.e. the hex digit count rounded up to an even number
+ */
+inline int width(int i) {
+    int c = 2;
+    unsigned int _i = i;
+    while(_i >>= 8)
+        c++;
+    c += c % 2;
+    
+    return c;
+}
+
+} //anonymous namespace
+
 namespace xmppsc {
   
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
@@ -39,17 +57,9 @@ unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 // http://stackoverflow.com/a/5100745
 const std::string int2hex(unsigned int i)
 {
-    // get the size
-    register int c = 2;
-    unsigned int _i = i;
-    while(_i >>= 8)
-        c++;
-    c += c % 2;
-
-    // create the hex stream
     std::stringstream stream;
     stream << "0x"
-           << std::setfill('0') << std::setw(c)
+           << std::setfill('0') << std::setw(width(i))
            << std::hex << i;
     return stream.str();
 }
