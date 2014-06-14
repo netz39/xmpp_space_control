@@ -13,28 +13,7 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -std=c++0x")
 endif()
 
-file(GLOB i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/*.cpp")
-list(REMOVE_ITEM i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/main.cpp")
-list(REMOVE_ITEM i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/i2cendpoint_dummy.cpp")
-list(REMOVE_ITEM i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/i2cendpoint_wiringpi.cpp")
-
-### Check and select the I2C library
-# dummy is the default
-set(I2C_ENDPOINT_IMPL "dummy")
-# do we have wiringPi?
-find_library(WIRINGPI_LIBRARY 
-	NAMES wiringPi wiringPiDev
-)
-if (WIRINGPI_LIBRARY)
-  # use this implementation instead and add the target link libraries
-  set(I2C_ENDPOINT_IMPL "wiringpi")
-endif(WIRINGPI_LIBRARY)
-
-list(APPEND i3c_sources "${CMAKE_CURRENT_SOURCE_DIR}/../i3c_client/i2cendpoint_${I2C_ENDPOINT_IMPL}.cpp")
-
-add_executable(i3c_cli main.cpp 
-			${client_sources}
-			${i3c_sources})
+add_executable(i3c_cli main.cpp ${client_sources})
 
 find_library(GLOOX_LIBRARY gloox)
 target_link_libraries(i3c_cli ${GLOOX_LIBRARY})
@@ -44,10 +23,3 @@ target_link_libraries(i3c_cli ${CONFIG_LIBRARY})
 
 find_library(XMPPSC_LIBRARY xmppsc-client)
 target_link_libraries(i3c_cli ${XMPPSC_LIBRARY})
-
-# if wiringPi has been included
-if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
-  # add link targets for the wiringPi libraries
-  # WIRINGPI_LIBRARY has already been checked before
-  target_link_libraries(i3c_cli ${WIRINGPI_LIBRARY})
-endif (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")

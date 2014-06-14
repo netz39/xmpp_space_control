@@ -20,6 +20,7 @@
 
 #include "i2cendpoint.h"
 #include "i2cmethods.h"
+
 #include <xmppsc/spacecontrolclient.h>
 
 namespace xmppsc {

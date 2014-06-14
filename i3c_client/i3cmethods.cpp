@@ -18,8 +18,7 @@
 
 #include "i3cmethods.h"
 
-#include <iostream>
-#include <sstream>
+#include <xmppsc/util.h>
 
 namespace {
 union I2C_result {
@@ -88,9 +87,9 @@ void I3CCallMethod::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, 
             params["device"] = int2hex(device);
             params["command"] = int2hex(command);
             params["data"] = int2hex(data);
-            params["response"] =  int2hex<int>(result.c[0]);
-            params["i2c.register"] = int2hex<int>(send);
-            params["i2c.response"] = int2hex<int>(result.r);
+            params["response"] =  int2hex(result.c[0]);
+            params["i2c.register"] = int2hex(send);
+            params["i2c.response"] = int2hex(result.r);
             const xmppsc::SpaceCommand idcmd("i3c.response", params);
             sink->sendSpaceCommand(idcmd);
         } else {
@@ -99,7 +98,7 @@ void I3CCallMethod::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, 
             params["device"] = int2hex(device);
             params["command"] = int2hex(command);
             params["data"] = int2hex(data);
-            params["i2c.register"] = int2hex<int>(send);
+            params["i2c.register"] = int2hex(send);
             const xmppsc::SpaceCommand idcmd("i3c.timeout", params);
             sink->sendSpaceCommand(idcmd);
         }

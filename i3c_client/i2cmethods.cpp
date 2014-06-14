@@ -24,41 +24,9 @@
 #include <iomanip>
 #include <sstream>
 
+#include <xmppsc/util.h>
+
 namespace xmppsc {
-
-unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
-{
-    std::stringstream conv;
-    conv << std::hex << hex;
-
-    int i;
-
-    if (! (conv >> i)) {
-        std::ostringstream msg("");
-        msg << "Error on hex value conversion (value " << hex << ")!";
-        throw std::invalid_argument(msg.str());
-    }
-
-    return i;
-}
-
-// http://stackoverflow.com/a/5100745
-template< typename T > const std::string int2hex(T i)
-{
-    // get the size
-    register int c = 2;
-    T _i = i;
-    while(_i >>= 8)
-        c++;
-    c += c % 2;
-
-    // create the hex stream
-    std::stringstream stream;
-    stream << "0x"
-           << std::setfill('0') << std::setw(c)
-           << std::hex << i;
-    return stream.str();
-}
 
 int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required, int def)
 throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameterException) {

@@ -23,13 +23,6 @@
 
 namespace xmppsc {
 
-unsigned int hex2int(const std::string& hex) throw(std::invalid_argument);
-
-template< typename T > const std::string int2hex(T i);
-
-int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required=true, int def=0)
-  throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameterException);
-
 #define I2C_EX_MSG \
         xmppsc::SpaceCommand::space_command_params params; \
         params["what"] = e.what(); \
