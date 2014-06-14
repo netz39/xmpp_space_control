@@ -18,10 +18,19 @@
 #ifndef UTIL_H__
 #define UTIL_H__
 
+#include <stdexcept>
+#include <string>
+
 namespace xmppsc {
-  
-  
-  
+
+//! Convert a hex string to integer value
+/**
+ * @param hex The hex value as string
+ * @returns the integer value
+ * @throws std::invalid_argument if the hex value cannot be converted.
+ */
+unsigned int hex2int(const std::string& hex) throw(std::invalid_argument);
+
 } // namespace xmppsc
 
 #endif // UTIL_H

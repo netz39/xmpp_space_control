@@ -15,8 +15,26 @@
 
 #include "util.h"
 
+#include <sstream>
+#include <iomanip>
+
 namespace xmppsc {
   
+unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
+{
+    std::stringstream conv;
+    conv << std::hex << hex;
+
+    int i;
+
+    if (! (conv >> i)) {
+        std::ostringstream msg("");
+        msg << "Error on hex value conversion (value " << hex << ")!";
+        throw std::invalid_argument(msg.str());
+    }
+
+    return i;
+}
   
   
 } // namespace xmppsc
