@@ -35,8 +35,26 @@ unsigned int hex2int(const std::string& hex) throw(std::invalid_argument)
 
     return i;
 }
-  
-  
+
+// http://stackoverflow.com/a/5100745
+const std::string int2hex(unsigned int i)
+{
+    // get the size
+    register int c = 2;
+    unsigned int _i = i;
+    while(_i >>= 8)
+        c++;
+    c += c % 2;
+
+    // create the hex stream
+    std::stringstream stream;
+    stream << "0x"
+           << std::setfill('0') << std::setw(c)
+           << std::hex << i;
+    return stream.str();
+}
+
+ 
 } // namespace xmppsc
 
 // End of File

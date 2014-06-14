@@ -31,6 +31,13 @@ namespace xmppsc {
  */
 unsigned int hex2int(const std::string& hex) throw(std::invalid_argument);
 
+//! Convert an integer value to hex string
+/**
+ * @param i the integer value
+ * @returns the hex string
+ */
+const std::string int2hex(unsigned int  i);
+
 } // namespace xmppsc
 
 #endif // UTIL_H
