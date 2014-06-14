@@ -21,6 +21,8 @@
 #include <stdexcept>
 #include <string>
 
+#include "spacecontrolclient.h"
+
 namespace xmppsc {
 
 //! Convert a hex string to integer value
@@ -37,6 +39,18 @@ unsigned int hex2int(const std::string& hex) throw(std::invalid_argument);
  * @returns the hex string
  */
 const std::string int2hex(unsigned int  i);
+
+//! Get the numeric value of a hex parameter in a command message
+/**
+ * @param parameter The name of the parameter
+ * @param sc the Space Command message
+ * @param required false if the parameter is not required, defaults to true
+ * @param def the default value if a non-required parameter is missing
+ * @throws xmppsc::IllegalCommandParameterException if the value is not a convertible hex
+ * @throws MissingCommandParameterException if the parameter is required but missing
+ */
+int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required=true, int def=0)
+  throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameterException);
 
 } // namespace xmppsc
 

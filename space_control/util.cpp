@@ -16,6 +16,7 @@
 #include "util.h"
 
 #include <sstream>
+#include <iostream>
 #include <iomanip>
 
 namespace {
@@ -64,6 +65,31 @@ const std::string int2hex(unsigned int i)
     return stream.str();
 }
 
+int retrieveHexParameter(const std::string& parameter, const xmppsc::SpaceCommand& sc, bool required, int def)
+throw (xmppsc::IllegalCommandParameterException, xmppsc::MissingCommandParameterException) {
+    try {
+        const std::string _val = sc.param(parameter);
+
+        // special handling for empty values
+        // This code seems a bit redundant, but we safe throwing an exception if the value is optional.
+        if (_val.empty()) {
+            if (required) {
+                std::ostringstream msg("");
+                msg << "Missing parameter value for " << parameter << "!";
+                throw xmppsc::MissingCommandParameterException(msg.str());
+            } else
+                return def;
+        }
+
+        return  hex2int(_val);
+    } catch (std::invalid_argument& ia) {
+        throw xmppsc::IllegalCommandParameterException(parameter, ia.what());
+    } catch (xmppsc::MissingCommandParameterException& e) {
+        if (required)
+            throw e;
+        return def;
+    }
+}
  
 } // namespace xmppsc
 
