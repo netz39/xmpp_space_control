@@ -8,8 +8,7 @@
 #include <xmppsc/configuredclientfactory.h>
 #include <xmppsc/spacecontrolclient.h>
 #include <xmppsc/methodhandler.h>
-
-#include "../i3c_client/i2cmethods.h"
+#include <xmppsc/util.h>
 
 void run_client(gloox::Client* client) {
     if (!client->connect(true)) {
