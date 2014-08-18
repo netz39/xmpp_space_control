@@ -10,6 +10,11 @@
 #include <xmppsc/methodhandler.h>
 #include <xmppsc/util.h>
 
+#include "finalizingcommandmethod.h"
+#include "i3cresponsemethod.h"
+
+using namespace xmppsc;
+
 void run_client(gloox::Client* client) {
     if (!client->connect(true)) {
         std::cerr << "could not connect!" << std::endl;
@@ -22,51 +27,6 @@ void wait_for_state(const gloox::Client* client, const gloox::ConnectionState& s
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
-
-class FinalizingCommandMethod : public xmppsc::CommandMethod {
-public:
-    FinalizingCommandMethod(gloox::Client* _client, const std::string _command)
-        : CommandMethod(_command), m_client(_client) {}
-
-    FinalizingCommandMethod(gloox::Client* _client, const t_command_set _commands)
-        : CommandMethod(_commands), m_client(_client) {}
-
-    //! Evaluate the result and decide if the client may be terminated.
-    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) = 0;
-
-    virtual void handleSpaceCommand(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-        if (evaluate_result(peer, sc, sink)) {
-            client()->disconnect();
-            wait_for_state(client(), gloox::ConnectionState::StateDisconnected);
-        }
-    }
-protected:
-    gloox::Client* client() const throw() {
-        return m_client;
-    }
-
-private:
-    gloox::Client* m_client;
-};
-
-class I3CResponseMethod : public FinalizingCommandMethod {
-public:
-    I3CResponseMethod(gloox::Client* _client) throw()
-        : FinalizingCommandMethod(_client, "i3c.response") {}
-    virtual ~I3CResponseMethod() throw() {}
-
-    virtual bool evaluate_result(gloox::JID peer, const xmppsc::SpaceCommand& sc, xmppsc::SpaceCommandSink* sink) {
-        // evaluate result
-        try {
-            const std::string response = sc.param("response");
-            std::cout << response << std::endl;
-        } catch (const xmppsc::MissingCommandParameterException& e) {
-            std::cerr << "Missing response!" << std::endl;
-        }
-
-        return true;
-    }
-};
 
 class I3CExceptionHandler : public FinalizingCommandMethod {
 public:

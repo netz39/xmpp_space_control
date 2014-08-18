@@ -13,7 +13,7 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -std=c++0x")
 endif()
 
-add_executable(i3c_cli main.cpp ${client_sources})
+add_executable(i3c_cli main.cpp finalizingcommandmethod.cpp i3cresponsemethod.cpp ${client_sources})
 
 find_library(GLOOX_LIBRARY gloox)
 target_link_libraries(i3c_cli ${GLOOX_LIBRARY})
