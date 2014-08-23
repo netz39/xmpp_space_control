@@ -123,12 +123,27 @@ int main(int argc, const char* argv[]) {
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
-        while (scc->conn_error() != gloox::ConnUserDisconnected) {
-            if (!client->connect(true))
-                std::cerr << "Could not connect: " << scc->conn_error() << std::endl;
+        while ( (scc->conn_error() != gloox::ConnUserDisconnected) &&
+	        (!daemon.sighup()) ) {
+            if (!client->connect(false)) {
+		// print error message
+		std::ostringstream msg;
+		msg << "Could not connect: " << scc->conn_error();
+		if (opt.foreground)
+		  std::cerr << msg.str() << std::endl;
+		else
+		  daemon.message(LOG_ERR, msg.str().c_str());
 
-            if (scc->conn_error() != gloox::ConnUserDisconnected)
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		// wait 30 seconds
+		if (opt.foreground)
+		  std::cerr << "Waiting 30 seconds until next try." << std::endl;
+		else
+		  syslog(LOG_ERR, "Waiting 30 seconds until next try.");
+		if (scc->conn_error() != gloox::ConnUserDisconnected)
+		    std::this_thread::sleep_for(std::chrono::milliseconds(30*1000));
+	    } else {  
+		client->recv(500);
+	    }
         }
 
         delete scc;
