@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <popt.h>
+#include <syslog.h>
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <chrono>
 
@@ -76,7 +78,8 @@ int main(int argc, const char* argv[]) {
 #endif
     }
     else if (!daemon.seed()) {
-        std::cerr << "Daemon already running!" << std::endl;
+        std::cerr << "Daemon could not be stated (already running or insufficient permissions)!" << std::endl;
+        daemon.message(LOG_EMERG, "Daemon could not be stated (already running or insufficient permissions)!");	
         exit(EXIT_FAILURE);
     }
 
@@ -93,7 +96,12 @@ int main(int argc, const char* argv[]) {
         client = ccf.newClient();
         af = ccf.newAccessFilter();
     } catch (xmppsc::ConfiguredClientFactoryException &ccfe) {
-        std::cerr << "ConfiguredClientFactoryException: " << ccfe.what() << std::endl;
+        std::ostringstream msg;
+        msg << "ConfiguredClientFactoryException: " << ccfe.what();
+	if (opt.foreground)
+	  std::cerr << msg.str() << std::endl;
+	else
+	  daemon.message(LOG_EMERG, msg.str().c_str());
         return (-1);
     }
 

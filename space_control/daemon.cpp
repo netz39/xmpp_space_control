@@ -79,6 +79,14 @@ bool Daemon::seed()
         //if we have a child then parent can exit
         exit(0);
     }
+
+    // check if there is already an instance running
+    if(!store_pid()) {
+        // if this is the second instance, return false 
+        // seeding failed, but we are in the child process
+        return false;
+    }
+
     //Set our sid and continue normal runtime as a forked process
     setsid();
     umask(0);    //Xxx set the unmask
@@ -86,11 +94,6 @@ bool Daemon::seed()
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
     close(STDIN_FILENO);
-
-    // check if there is already an instance running
-    if(!store_pid()) {
-        return false;
-    }
 
     message(LOG_NOTICE, "Daemon started with PID %d.", getpid());
     return true;
