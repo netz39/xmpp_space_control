@@ -25,14 +25,17 @@ public:
 
     bool foreground;
     std::string pid_file;
+    std::string config_file;
 };
 
 bool Options::read_options(int argc, const char* argv[]) {
     char* _pid_file=0;
+    char* _config_file=0;
 
     struct poptOption optionsTable[] = {
         {"foreground", 0, POPT_ARG_NONE | POPT_ARGFLAG_OPTIONAL , 0, 'd', "Run in foreground, not as daemon", NULL},
         {"pidfile", 'p', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, &_pid_file, 0, "PID file", "path to PID file"},
+        {"config", 'c', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, &_config_file, 0, "Config file", "path to the configuration file"},
         POPT_AUTOHELP
         { NULL, 0, 0, NULL, 0 }
     };
@@ -58,6 +61,9 @@ bool Options::read_options(int argc, const char* argv[]) {
     // Extract the PID file
     this->pid_file = std::string(_pid_file ? _pid_file : "/var/run/i3c_client");
 
+    // Extract the config file
+    this->config_file = std::string(_config_file ? _config_file : "/etc/i3c_client/spacecontrol.config");
+    
     return true;
 }
 
@@ -92,7 +98,7 @@ int main(int argc, const char* argv[]) {
     gloox::Client* client=0;
     xmppsc::AccessFilter* af=0;
     try {
-        xmppsc::ConfiguredClientFactory ccf("spacecontrol.config");
+        xmppsc::ConfiguredClientFactory ccf(opt.config_file);
         client = ccf.newClient();
         af = ccf.newAccessFilter();
     } catch (xmppsc::ConfiguredClientFactoryException &ccfe) {
