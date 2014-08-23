@@ -1,0 +1,103 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          i3cclient
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: I3C Client
+# Description:       I3C client for XMPP Space Control
+### END INIT INFO
+# -*- coding: utf-8 -*-
+
+set -e
+
+DAEMON=/usr/local/bin/i3cclient
+NAME=i3cclient
+DAEMONUSER=i3c
+PIDDIR=/var/run/i3cclient
+PIDFILE=$PIDDIR/pid
+CONFIGFILE=/etc/ic3client/spacecontrol.config
+DESC="I3C Client"
+
+test -x $DAEMON || exit 0
+
+. /lib/lsb/init-functions
+
+# Source defaults file; edit that file to configure this script.
+PARAMS=""
+if [ -e /etc/default/$NAME ]; then
+  . /etc/default/$NAME
+fi
+
+start_it_up()
+{
+  if [ ! -d $PIDDIR ]; then
+    mkdir -p $PIDDIR
+    chown $DAEMONUSER $PIDDIR
+    chgrp $DAEMONUSER $PIDDIR
+  fi
+
+  if ! mountpoint -q /proc/ ; then
+    log_failure_msg "Can't start $DESC - /proc is not mounted"
+    return
+  fi
+
+#  if [ -e $PIDFILE ]; then
+#    if $0 status > /dev/null ; then
+#      log_success_msg "$DESC already started; not starting."
+#      return
+#    else
+#      log_success_msg "Removing stale PID file $PIDFILE."
+#      rm -f $PIDFILE
+#    fi
+#  fi
+
+  log_daemon_msg "Starting $DESC" "$NAME"
+  start-stop-daemon --start --quiet --pidfile $PIDFILE --user $DAEMONUSER \
+                    --exec $DAEMON -- -p $PIDFILE -c $CONFIGFILE
+  log_end_msg $?
+}
+
+shut_it_down()
+{
+  log_daemon_msg "Stopping $DESC" "$NAME"
+  start-stop-daemon --stop --signal HUP --retry 5 --quiet --oknodo --pidfile $PIDFILE \
+    --user $DAEMONUSER
+  # We no longer include these arguments so that start-stop-daemon
+  # can do its job even given that we may have been upgraded.
+  # We rely on the pidfile being sanely managed
+  # --exec $DAEMON -- --system $PARAMS
+  log_end_msg $?
+  rm -f $PIDFILE
+}
+
+reload_it()
+{
+  shut_it_down
+  start_it_up
+}
+
+case "$1" in
+  start)
+    start_it_up
+  ;;
+  stop)
+    shut_it_down
+  ;;
+  reload|force-reload)
+    reload_it
+  ;;
+  restart)
+    shut_it_down
+    start_it_up
+  ;;
+  status)
+    status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
+    ;;
+  *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|reload|restart|force-reload|status}" >&2
+    exit 2
+  ;;
+esac
+
