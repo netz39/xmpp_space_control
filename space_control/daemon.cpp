@@ -79,6 +79,14 @@ bool Daemon::seed()
         //if we have a child then parent can exit
         exit(0);
     }
+
+    // check if there is already an instance running
+    if(!store_pid()) {
+        // if this is the second instance, return false 
+        // seeding failed, but we are in the child process
+        return false;
+    }
+
     //Set our sid and continue normal runtime as a forked process
     setsid();
     umask(0);    //Xxx set the unmask
@@ -87,17 +95,16 @@ bool Daemon::seed()
     close(STDERR_FILENO);
     close(STDIN_FILENO);
 
-    // check if there is already an instance running
-    if(!store_pid()) {
-        return false;
-    }
-
     message(LOG_NOTICE, "Daemon started with PID %d.", getpid());
     return true;
 }
 
 bool Daemon::store_pid()
 {
+    // store pid file only if a path is set, otherwise we are automatically successful
+    if (m_pid_path == "")
+      return true;
+    
     if((m_lock = open(m_pid_path.c_str(), O_RDWR | O_CREAT, 0644)) == -1) {
         message(LOG_ERR, "Failed to open the PID file.");
         // TODO rather an exception

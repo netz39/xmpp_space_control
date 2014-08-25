@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <popt.h>
+#include <syslog.h>
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <chrono>
 
@@ -23,14 +25,17 @@ public:
 
     bool foreground;
     std::string pid_file;
+    std::string config_file;
 };
 
 bool Options::read_options(int argc, const char* argv[]) {
     char* _pid_file=0;
+    char* _config_file=0;
 
     struct poptOption optionsTable[] = {
         {"foreground", 0, POPT_ARG_NONE | POPT_ARGFLAG_OPTIONAL , 0, 'd', "Run in foreground, not as daemon", NULL},
         {"pidfile", 'p', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, &_pid_file, 0, "PID file", "path to PID file"},
+        {"config", 'c', POPT_ARG_STRING | POPT_ARGFLAG_OPTIONAL, &_config_file, 0, "Config file", "path to the configuration file"},
         POPT_AUTOHELP
         { NULL, 0, 0, NULL, 0 }
     };
@@ -56,6 +61,9 @@ bool Options::read_options(int argc, const char* argv[]) {
     // Extract the PID file
     this->pid_file = std::string(_pid_file ? _pid_file : "/var/run/i3c_client");
 
+    // Extract the config file
+    this->config_file = std::string(_config_file ? _config_file : "/etc/i3c_client/spacecontrol.config");
+    
     return true;
 }
 
@@ -76,7 +84,8 @@ int main(int argc, const char* argv[]) {
 #endif
     }
     else if (!daemon.seed()) {
-        std::cerr << "Daemon already running!" << std::endl;
+        std::cerr << "Daemon could not be stated (already running or insufficient permissions)!" << std::endl;
+        daemon.message(LOG_EMERG, "Daemon could not be stated (already running or insufficient permissions)!");	
         exit(EXIT_FAILURE);
     }
 
@@ -89,11 +98,16 @@ int main(int argc, const char* argv[]) {
     gloox::Client* client=0;
     xmppsc::AccessFilter* af=0;
     try {
-        xmppsc::ConfiguredClientFactory ccf("spacecontrol.config");
+        xmppsc::ConfiguredClientFactory ccf(opt.config_file);
         client = ccf.newClient();
         af = ccf.newAccessFilter();
     } catch (xmppsc::ConfiguredClientFactoryException &ccfe) {
-        std::cerr << "ConfiguredClientFactoryException: " << ccfe.what() << std::endl;
+        std::ostringstream msg;
+        msg << "ConfiguredClientFactoryException: " << ccfe.what();
+	if (opt.foreground)
+	  std::cerr << msg.str() << std::endl;
+	else
+	  daemon.message(LOG_EMERG, msg.str().c_str());
         return (-1);
     }
 
@@ -115,12 +129,27 @@ int main(int argc, const char* argv[]) {
         xmppsc::SpaceControlClient* scc = new xmppsc::SpaceControlClient(client, i2ch,
                 new xmppsc::TextSpaceCommandSerializer(), af);
 
-        while (scc->conn_error() != gloox::ConnUserDisconnected) {
-            if (!client->connect(true))
-                std::cerr << "Could not connect: " << scc->conn_error() << std::endl;
+        while ( (scc->conn_error() != gloox::ConnUserDisconnected) &&
+	        (!daemon.sighup()) ) {
+            if (!client->connect(false)) {
+		// print error message
+		std::ostringstream msg;
+		msg << "Could not connect: " << scc->conn_error();
+		if (opt.foreground)
+		  std::cerr << msg.str() << std::endl;
+		else
+		  daemon.message(LOG_ERR, msg.str().c_str());
 
-            if (scc->conn_error() != gloox::ConnUserDisconnected)
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		// wait 30 seconds
+		if (opt.foreground)
+		  std::cerr << "Waiting 30 seconds until next try." << std::endl;
+		else
+		  syslog(LOG_ERR, "Waiting 30 seconds until next try.");
+		if (scc->conn_error() != gloox::ConnUserDisconnected)
+		    std::this_thread::sleep_for(std::chrono::milliseconds(30*1000));
+	    } else {  
+		client->recv(500);
+	    }
         }
 
         delete scc;

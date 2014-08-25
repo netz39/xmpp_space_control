@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cassert>
 
 namespace xmppsc {
 
@@ -51,8 +52,11 @@ void MethodHandler::handleSpaceCommand(gloox::JID peer, const SpaceCommand& sc, 
                 SpaceCommand ex("exception", par);
                 sink->sendSpaceCommand(ex);
             }
-        } else
+        } else {
             std::cerr << "Assertion error: Method not found, but did not throw an exception!" << std::endl;
+	    // fail in debug mode
+	    assert(0);
+	}
     } catch (std::out_of_range &oor) {
         SpaceCommand::space_command_params par;
         par["what"] = oor.what();
