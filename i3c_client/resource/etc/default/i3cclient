@@ -1,0 +1,4 @@
+# I3C Client init configuration
+
+# so far there is nothing to be done here
+# See /etc/init.d/i3cclient/spacecontrol.config for XMPP configuration.

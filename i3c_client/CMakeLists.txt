@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 2.8)
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
 
+include(GNUInstallDirs)
+
 if(COMPILER_SUPPORTS_CXX11)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DCOMPILER_SUPPORTS_CXX11")
 else()
@@ -42,10 +44,33 @@ target_link_libraries(i3c_client ${POPT_LIBRARY})
 find_library(XMPPSC_LIBRARY xmppsc-client)
 target_link_libraries(i3c_client ${XMPPSC_LIBRARY})
 
-
 # if wiringPi has been included
 if (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
   # add link targets for the wiringPi libraries
   # WIRINGPI_LIBRARY has already been checked before
   target_link_libraries(i3c_client ${WIRINGPI_LIBRARY})
 endif (I2C_ENDPOINT_IMPL STREQUAL "wiringpi")
+
+
+# Installation stuff
+install(TARGETS i3c_client 
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(FILES spacecontrol.config.example
+  DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}
+)
+
+# TODO rather with ${CMAKE_INSTALL_FULL_SYSCONFDIR}
+# How to set /etc as target directory?
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resource/etc/init.d/i3cclient"
+  DESTINATION /etc/init.d/
+)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resource/etc/default/i3cclient"
+  DESTINATION /etc/default/
+)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resource/etc/i3cclient/spacecontrol.config"
+  DESTINATION /etc/i3cclient/
+)
+
